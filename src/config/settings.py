@@ -44,7 +44,7 @@ class Settings:
             
             # Configuraciones de datos
             'data': {
-                'cards_file': 'data/cartas.csv',
+                'cards_file': 'data/databaseMTG.csv',
                 'decks_directory': 'data/decks',
                 'cache_directory': 'data/cache',
                 'images_directory': 'data/images',
@@ -190,7 +190,7 @@ class Settings:
     
     @property
     def cards_file(self) -> str:
-        return self.get('data.cards_file', 'data/cartas.csv')
+        return self.get('data.cards_file', 'data/databaseMTG.csv')
     
     @property
     def decks_directory(self) -> str:

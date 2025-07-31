@@ -15,7 +15,7 @@
     "font_size": 10
   },
   "data": {
-    "cards_file": "data/cartas.csv",
+    "cards_file": "data/databaseMTG.csv",
     "decks_directory": "data/decks",
     "cache_directory": "data/cache",
     "images_directory": "data/images",
@@ -28,8 +28,14 @@
     "cache_size_mb": 500,
     "auto_download": true,
     "image_quality": "normal",
-    "thumbnail_size": [200, 280],
-    "full_size": [488, 680],
+    "thumbnail_size": [
+      200,
+      280
+    ],
+    "full_size": [
+      488,
+      680
+    ],
     "timeout_seconds": 30
   },
   "api": {
@@ -40,7 +46,11 @@
     "user_agent": "MTG Deck Constructor/1.0"
   },
   "import_export": {
-    "supported_formats": ["txt", "json", "csv"],
+    "supported_formats": [
+      "txt",
+      "json",
+      "csv"
+    ],
     "default_export_format": "txt",
     "include_metadata": true,
     "auto_detect_format": true

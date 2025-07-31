@@ -60,20 +60,16 @@ class AppController:
         try:
             # Servicio de cartas
             self.card_service = CardService(
-                cards_file=self.settings.cards_file
+                data_path=self.settings.cards_file
             )
             
             # Servicio de imágenes
             self.image_service = ImageService(
-                cache_dir=self.settings.images_directory,
-                cache_enabled=self.settings.image_cache_enabled
+                cache_dir=self.settings.images_directory
             )
             
             # Servicio de Scryfall
-            self.scryfall_service = ScryfallService(
-                base_url=self.settings.scryfall_api_url,
-                rate_limit_delay=self.settings.api_rate_limit
-            )
+            self.scryfall_service = ScryfallService()
             
             # Servicio de mazos
             self.deck_service = DeckService(
