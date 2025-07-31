@@ -1,0 +1,64 @@
+{
+  "app": {
+    "name": "MTG Deck Constructor",
+    "version": "1.0.0",
+    "debug": false,
+    "language": "es"
+  },
+  "ui": {
+    "theme": "default",
+    "window_width": 1200,
+    "window_height": 800,
+    "window_resizable": true,
+    "remember_window_size": true,
+    "font_family": "Arial",
+    "font_size": 10
+  },
+  "data": {
+    "cards_file": "data/cartas.csv",
+    "decks_directory": "data/decks",
+    "cache_directory": "data/cache",
+    "images_directory": "data/images",
+    "backup_directory": "data/backups",
+    "auto_backup": true,
+    "backup_interval_days": 7
+  },
+  "images": {
+    "cache_enabled": true,
+    "cache_size_mb": 500,
+    "auto_download": true,
+    "image_quality": "normal",
+    "thumbnail_size": [200, 280],
+    "full_size": [488, 680],
+    "timeout_seconds": 30
+  },
+  "api": {
+    "scryfall_base_url": "https://api.scryfall.com",
+    "rate_limit_delay": 0.1,
+    "max_retries": 3,
+    "timeout_seconds": 30,
+    "user_agent": "MTG Deck Constructor/1.0"
+  },
+  "import_export": {
+    "supported_formats": ["txt", "json", "csv"],
+    "default_export_format": "txt",
+    "include_metadata": true,
+    "auto_detect_format": true
+  },
+  "analysis": {
+    "enable_mana_curve": true,
+    "enable_color_analysis": true,
+    "enable_type_analysis": true,
+    "enable_rarity_analysis": true,
+    "enable_set_analysis": true,
+    "cache_analysis_results": true
+  },
+  "logging": {
+    "level": "INFO",
+    "file_enabled": true,
+    "file_path": "logs/app.log",
+    "max_file_size_mb": 10,
+    "backup_count": 5,
+    "console_enabled": true
+  }
+}

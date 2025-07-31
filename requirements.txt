@@ -1,0 +1,31 @@
+# MTG Deck Constructor App - Dependencias
+
+# Interfaz gráfica (incluida en Python estándar)
+# tkinter - incluido en Python
+
+# Manejo de solicitudes HTTP
+requests>=2.28.0
+
+# Manejo de imágenes
+Pillow>=9.0.0
+
+# Análisis de datos (opcional, para estadísticas avanzadas)
+pandas>=1.5.0
+
+# Validación de datos
+pydantic>=1.10.0
+
+# Logging avanzado (opcional)
+loguru>=0.6.0
+
+# Testing (desarrollo)
+pytest>=7.0.0
+pytest-cov>=4.0.0
+
+# Formateo de código (desarrollo)
+black>=22.0.0
+flake8>=5.0.0
+
+# Documentación (desarrollo)
+sphinx>=5.0.0
+sphinx-rtd-theme>=1.0.0
