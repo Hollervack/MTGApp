@@ -187,5 +187,6 @@ cartas_incompletas_log.csv
 *.temp
 
 # Image cache or downloaded images
-# images/
-# cache/
+images/
+cache/
+logs/

@@ -33,41 +33,50 @@ MTGDeckConstructorApp/
 └── README.md           # Este archivo
 ```
 
-## 🚀 Instalación y Configuración
+## 🚀 Instalación Rápida
 
-### Requisitos Previos
+```bash
+git clone <repository-url>
+cd MTGDeckConstructorApp
+python -m venv venv
+source venv/bin/activate  # En macOS/Linux
+pip install -r requirements.txt
+python main.py
+```
 
-- Python 3.8 o superior
-- pip (gestor de paquetes de Python)
+📖 **Para instrucciones detalladas, consulta [docs/INSTALLATION.md](docs/INSTALLATION.md)**
 
-### Instalación
+## 📚 Documentación
 
-1. **Clonar o descargar el proyecto**:
-   ```bash
-   git clone <repository-url>
-   cd MTGDeckConstructorApp
-   ```
+- **[Instalación y Configuración](docs/INSTALLATION.md)** - Guía completa de instalación
+- **[API y Arquitectura](docs/API.md)** - Documentación técnica detallada
+- **[Guía de Desarrollo](docs/DEVELOPMENT.md)** - Para contribuidores y desarrolladores
+- **[Changelog](CHANGELOG.md)** - Historial de cambios del proyecto
 
-2. **Crear un entorno virtual (recomendado)**:
-   ```bash
-   python -m venv venv
-   
-   # En Windows:
-   venv\Scripts\activate
-   
-   # En macOS/Linux:
-   source venv/bin/activate
-   ```
+## 🧪 Testing
 
-3. **Instalar dependencias**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+El proyecto incluye una suite completa de tests con **66.7% de éxito**:
 
-4. **Ejecutar la aplicación**:
-   ```bash
-   python main.py
-   ```
+```bash
+# Ejecutar todos los tests
+python -m pytest
+
+# Ejecutar con el script personalizado
+python run_tests.py
+
+# Tests con cobertura
+python -m pytest --cov=src
+```
+
+## ✨ Características Técnicas
+
+- **Arquitectura MVC**: Separación clara de responsabilidades
+- **Inyección de Dependencias**: Código modular y testeable
+- **Cache Inteligente**: Optimización de rendimiento para imágenes
+- **API Integration**: Conexión con Scryfall para datos actualizados
+- **Testing Suite**: Tests unitarios y de integración
+- **Type Hints**: Código autodocumentado y más mantenible
+- **Error Handling**: Manejo robusto de errores y excepciones
 
 ## 📊 Estructura de Datos
 
