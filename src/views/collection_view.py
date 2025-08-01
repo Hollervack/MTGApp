@@ -1,4 +1,4 @@
-"""Vista de la colección de cartas"""
+"""Card collection view"""
 
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, simpledialog
@@ -10,7 +10,7 @@ from ..models.card import Card
 
 
 class CollectionView:
-    """Vista para gestionar la colección de cartas del usuario"""
+    """View for managing the user's card collection"""
     
     def __init__(self, parent: tk.Widget, app_controller: AppController):
         self.parent = parent
@@ -24,8 +24,8 @@ class CollectionView:
         self._load_collection()
     
     def _create_interface(self):
-        """Crea la interfaz de la colección"""
-        # Frame principal
+        """Creates the main interface"""
+        # Main frame
         self.frame = ttk.Frame(self.parent)
         self.frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
@@ -40,69 +40,69 @@ class CollectionView:
     
     def _create_tools_panel(self):
         """Crea el panel de herramientas"""
-        tools_frame = ttk.LabelFrame(self.frame, text="Herramientas de Colección")
+        tools_frame = ttk.LabelFrame(self.frame, text="Collection Tools")
         tools_frame.pack(fill=tk.X, pady=(0, 10))
         
-        # Primera fila - importar/exportar
+        # Tool buttons
         row1_frame = ttk.Frame(tools_frame)
         row1_frame.pack(fill=tk.X, padx=5, pady=5)
         
-        ttk.Button(row1_frame, text="Importar Colección", command=self._import_collection).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(row1_frame, text="Exportar Colección", command=self._export_collection).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(row1_frame, text="Limpiar Colección", command=self._clear_collection).pack(side=tk.LEFT, padx=(0, 10))
+        ttk.Button(row1_frame, text="Import Collection", command=self._import_collection).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(row1_frame, text="Export Collection", command=self._export_collection).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(row1_frame, text="Clear Collection", command=self._clear_collection).pack(side=tk.LEFT, padx=(0, 10))
         
         # Separador
         ttk.Separator(row1_frame, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=10)
         
-        # Búsqueda en colección
-        ttk.Label(row1_frame, text="Buscar en colección:").pack(side=tk.LEFT, padx=(0, 5))
+        # Search
+        ttk.Label(row1_frame, text="Search in collection:").pack(side=tk.LEFT, padx=(0, 5))
         self.search_var = tk.StringVar()
         search_entry = ttk.Entry(row1_frame, textvariable=self.search_var, width=25)
         search_entry.pack(side=tk.LEFT, padx=(0, 5))
         search_entry.bind('<KeyRelease>', self._on_search_changed)
         
-        ttk.Button(row1_frame, text="Buscar", command=self._search_collection).pack(side=tk.LEFT)
+        ttk.Button(row1_frame, text="Search", command=self._search_collection).pack(side=tk.LEFT)
         
-        # Segunda fila - agregar cartas
+        # Second row - add cards
         row2_frame = ttk.Frame(tools_frame)
         row2_frame.pack(fill=tk.X, padx=5, pady=5)
         
-        ttk.Label(row2_frame, text="Agregar carta:").pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Label(row2_frame, text="Add card:").pack(side=tk.LEFT, padx=(0, 5))
         self.add_card_var = tk.StringVar()
         add_card_entry = ttk.Entry(row2_frame, textvariable=self.add_card_var, width=25)
         add_card_entry.pack(side=tk.LEFT, padx=(0, 5))
         
-        ttk.Label(row2_frame, text="Cantidad:").pack(side=tk.LEFT, padx=(5, 5))
+        ttk.Label(row2_frame, text="Quantity:").pack(side=tk.LEFT, padx=(5, 5))
         self.quantity_var = tk.StringVar(value="1")
         quantity_spin = ttk.Spinbox(row2_frame, from_=1, to=99, textvariable=self.quantity_var, width=5)
         quantity_spin.pack(side=tk.LEFT, padx=(0, 5))
         
-        ttk.Button(row2_frame, text="Agregar", command=self._add_card_to_collection).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(row2_frame, text="Quitar", command=self._remove_card_from_collection).pack(side=tk.LEFT)
+        ttk.Button(row2_frame, text="Add", command=self._add_card_to_collection).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(row2_frame, text="Remove", command=self._remove_card_from_collection).pack(side=tk.LEFT)
     
     def _create_collection_panel(self):
-        """Crea el panel de la colección"""
-        collection_frame = ttk.LabelFrame(self.frame, text="Mi Colección")
+        """Creates the collection panel"""
+        collection_frame = ttk.LabelFrame(self.frame, text="My Collection")
         collection_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
         
-        # Crear Treeview para mostrar la colección
+        # Create Treeview to display collection
         tree_frame = ttk.Frame(collection_frame)
         tree_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         
-        # Configurar columnas
+        # Configure columns
         columns = ('quantity', 'name', 'mana_cost', 'type', 'rarity', 'set', 'value')
         self.collection_tree = ttk.Treeview(tree_frame, columns=columns, show='headings', height=20)
         
-        # Configurar encabezados
-        self.collection_tree.heading('quantity', text='Cant.')
-        self.collection_tree.heading('name', text='Nombre')
-        self.collection_tree.heading('mana_cost', text='Coste')
-        self.collection_tree.heading('type', text='Tipo')
-        self.collection_tree.heading('rarity', text='Rareza')
+        # Configure headers
+        self.collection_tree.heading('quantity', text='Qty.')
+        self.collection_tree.heading('name', text='Name')
+        self.collection_tree.heading('mana_cost', text='Cost')
+        self.collection_tree.heading('type', text='Type')
+        self.collection_tree.heading('rarity', text='Rarity')
         self.collection_tree.heading('set', text='Set')
-        self.collection_tree.heading('value', text='Valor')
+        self.collection_tree.heading('value', text='Value')
         
-        # Configurar anchos de columna
+        # Configure column widths
         self.collection_tree.column('quantity', width=50)
         self.collection_tree.column('name', width=200)
         self.collection_tree.column('mana_cost', width=80)
@@ -125,16 +125,16 @@ class CollectionView:
         self.collection_tree.bind('<<TreeviewSelect>>', self._on_card_selected)
         self.collection_tree.bind('<Double-1>', self._on_card_double_click)
         
-        # Frame para botones de acción
+        # Action buttons
         actions_frame = ttk.Frame(collection_frame)
         actions_frame.pack(fill=tk.X, padx=5, pady=(0, 5))
         
-        ttk.Button(actions_frame, text="Editar Cantidad", command=self._edit_quantity).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(actions_frame, text="Ver Detalles", command=self._view_card_details).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(actions_frame, text="Eliminar", command=self._remove_selected_card).pack(side=tk.LEFT)
+        ttk.Button(actions_frame, text="Edit Quantity", command=self._edit_quantity).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(actions_frame, text="View Details", command=self._view_card_details).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(actions_frame, text="Delete", command=self._remove_selected_card).pack(side=tk.LEFT)
     
     def _create_stats_panel(self):
-        """Crea el panel de estadísticas"""
+        """Creates the statistics panel"""
         stats_frame = ttk.LabelFrame(self.frame, text="Estadísticas de la Colección")
         stats_frame.pack(fill=tk.X)
         
@@ -146,46 +146,46 @@ class CollectionView:
         row1_stats = ttk.Frame(stats_content)
         row1_stats.pack(fill=tk.X, pady=(0, 5))
         
-        self.total_cards_label = ttk.Label(row1_stats, text="Total de cartas: 0")
+        self.total_cards_label = ttk.Label(row1_stats, text="Total cards: 0")
         self.total_cards_label.pack(side=tk.LEFT, padx=(0, 20))
         
-        self.unique_cards_label = ttk.Label(row1_stats, text="Cartas únicas: 0")
+        self.unique_cards_label = ttk.Label(row1_stats, text="Unique cards: 0")
         self.unique_cards_label.pack(side=tk.LEFT, padx=(0, 20))
         
-        self.total_value_label = ttk.Label(row1_stats, text="Valor total: $0.00")
+        self.total_value_label = ttk.Label(row1_stats, text="Total value: $0.00")
         self.total_value_label.pack(side=tk.LEFT)
         
         # Segunda fila de estadísticas
         row2_stats = ttk.Frame(stats_content)
         row2_stats.pack(fill=tk.X)
         
-        self.by_rarity_label = ttk.Label(row2_stats, text="Por rareza: Común: 0, Poco común: 0, Rara: 0, Mítica: 0")
+        self.by_rarity_label = ttk.Label(row2_stats, text="By rarity: Common: 0, Uncommon: 0, Rare: 0, Mythic: 0")
         self.by_rarity_label.pack(side=tk.LEFT)
     
     def _load_collection(self):
-        """Carga la colección desde el almacenamiento"""
+        """Loads the collection from storage"""
         try:
-            # Por ahora, colección vacía
-            # TODO: Implementar carga desde archivo
+            # For now, empty collection
+            # TODO: Implement loading from file
             self.collection_cards = {}
             self._update_collection_display()
         except Exception as e:
-            self.logger.error(f"Error cargando colección: {e}")
-            messagebox.showerror("Error", f"Error cargando colección: {e}")
+            self.logger.error(f"Error loading collection: {e}")
+            messagebox.showerror("Error", f"Error loading collection: {e}")
     
     def _update_collection_display(self):
-        """Actualiza la visualización de la colección"""
-        # Limpiar árbol
+        """Updates the collection display"""
+        # Clear tree
         for item in self.collection_tree.get_children():
             self.collection_tree.delete(item)
         
-        # Agregar cartas de la colección
+        # Add collection cards
         for card_name, quantity in self.collection_cards.items():
-            # Buscar información de la carta
+            # Search for card information
             try:
                 cards = self.app_controller.search_cards(card_name)
                 if cards:
-                    card = cards[0]  # Tomar la primera coincidencia
+                    card = cards[0]  # Take first match
                     self.collection_tree.insert('', tk.END, values=(
                         quantity,
                         card.card_name,
@@ -193,32 +193,32 @@ class CollectionView:
                         getattr(card, 'type_line', ''),
                         getattr(card, 'rarity', ''),
                         getattr(card, 'set_code', ''),
-                        "$0.00"  # TODO: Implementar precios
+                        "$0.00"  # TODO: Implement prices
                     ))
                 else:
-                    # Carta no encontrada en la base de datos
+                    # Card not found in database
                     self.collection_tree.insert('', tk.END, values=(
                         quantity,
                         card_name,
                         "?", "?", "?", "?", "$0.00"
                     ))
             except Exception as e:
-                self.logger.error(f"Error obteniendo información de carta {card_name}: {e}")
+                self.logger.error(f"Error getting card information {card_name}: {e}")
         
         self._update_stats()
     
     def _update_stats(self):
-        """Actualiza las estadísticas de la colección"""
+        """Updates the collection statistics"""
         total_cards = sum(self.collection_cards.values())
         unique_cards = len(self.collection_cards)
         
-        self.total_cards_label.config(text=f"Total de cartas: {total_cards}")
-        self.unique_cards_label.config(text=f"Cartas únicas: {unique_cards}")
-        self.total_value_label.config(text="Valor total: $0.00")  # TODO: Calcular valor real
-        self.by_rarity_label.config(text="Por rareza: Común: 0, Poco común: 0, Rara: 0, Mítica: 0")  # TODO: Calcular por rareza
+        self.total_cards_label.config(text=f"Total cards: {total_cards}")
+        self.unique_cards_label.config(text=f"Unique cards: {unique_cards}")
+        self.total_value_label.config(text="Total value: $0.00")  # TODO: Calcular valor real
+        self.by_rarity_label.config(text="By rarity: Common: 0, Uncommon: 0, Rare: 0, Mythic: 0")  # TODO: Calcular por rareza
     
     def _on_search_changed(self, event=None):
-        """Maneja cambios en la búsqueda"""
+        """Handles search changes"""
         search_term = self.search_var.get().strip().lower()
         if not search_term:
             self._update_collection_display()
@@ -234,7 +234,7 @@ class CollectionView:
         self._display_filtered_collection(filtered_cards)
     
     def _display_filtered_collection(self, filtered_cards: Dict[str, int]):
-        """Muestra una colección filtrada"""
+        """Shows a filtered collection"""
         # Limpiar árbol
         for item in self.collection_tree.get_children():
             self.collection_tree.delete(item)
@@ -255,38 +255,38 @@ class CollectionView:
                         "$0.00"
                     ))
             except Exception as e:
-                self.logger.error(f"Error en carta filtrada {card_name}: {e}")
+                self.logger.error(f"Error in filtered card {card_name}: {e}")
     
     def _search_collection(self):
-        """Realiza búsqueda en la colección"""
+        """Performs search in the collection"""
         self._on_search_changed()
     
     def _add_card_to_collection(self):
-        """Agrega una carta a la colección"""
+        """Adds a card to the collection"""
         card_name = self.add_card_var.get().strip()
         if not card_name:
-            messagebox.showwarning("Advertencia", "Ingresa el nombre de una carta")
+            messagebox.showwarning("Warning", "Enter a card name")
             return
         
         try:
             quantity = int(self.quantity_var.get())
             if quantity <= 0:
-                messagebox.showwarning("Advertencia", "La cantidad debe ser mayor a 0")
+                messagebox.showwarning("Warning", "Quantity must be greater than 0")
                 return
         except ValueError:
-            messagebox.showwarning("Advertencia", "Cantidad inválida")
+            messagebox.showwarning("Warning", "Invalid quantity")
             return
         
         # Verificar que la carta existe
         try:
             cards = self.app_controller.search_cards(card_name)
             if not cards:
-                result = messagebox.askyesno("Carta no encontrada", 
-                                           f"No se encontró la carta '{card_name}' en la base de datos.\n¿Agregarla de todas formas?")
+                result = messagebox.askyesno("Card not found", 
+                                           f"Card '{card_name}' not found in database.\nAdd it anyway?")
                 if not result:
                     return
         except Exception as e:
-            self.logger.error(f"Error verificando carta: {e}")
+            self.logger.error(f"Error verifying card: {e}")
         
         # Agregar a la colección
         if card_name in self.collection_cards:
@@ -301,36 +301,36 @@ class CollectionView:
         # Actualizar visualización
         self._update_collection_display()
         
-        messagebox.showinfo("Éxito", f"Se agregaron {quantity}x {card_name} a la colección")
+        messagebox.showinfo("Success", f"Added {quantity}x {card_name} to collection")
     
     def _remove_card_from_collection(self):
-        """Quita una carta de la colección"""
+        """Removes a card from the collection"""
         card_name = self.add_card_var.get().strip()
         if not card_name:
-            messagebox.showwarning("Advertencia", "Ingresa el nombre de una carta")
+            messagebox.showwarning("Warning", "Enter a card name")
             return
         
         if card_name not in self.collection_cards:
-            messagebox.showwarning("Advertencia", "La carta no está en la colección")
+            messagebox.showwarning("Warning", "Card is not in collection")
             return
         
         try:
             quantity = int(self.quantity_var.get())
             if quantity <= 0:
-                messagebox.showwarning("Advertencia", "La cantidad debe ser mayor a 0")
+                messagebox.showwarning("Warning", "Quantity must be greater than 0")
                 return
         except ValueError:
-            messagebox.showwarning("Advertencia", "Cantidad inválida")
+            messagebox.showwarning("Warning", "Invalid quantity")
             return
         
         # Quitar de la colección
         current_quantity = self.collection_cards[card_name]
         if quantity >= current_quantity:
             del self.collection_cards[card_name]
-            messagebox.showinfo("Éxito", f"Se quitó completamente {card_name} de la colección")
+            messagebox.showinfo("Success", f"Completely removed {card_name} from collection")
         else:
             self.collection_cards[card_name] -= quantity
-            messagebox.showinfo("Éxito", f"Se quitaron {quantity}x {card_name} de la colección")
+            messagebox.showinfo("Success", f"Removed {quantity}x {card_name} from collection")
         
         # Limpiar campos
         self.add_card_var.set("")
@@ -340,7 +340,7 @@ class CollectionView:
         self._update_collection_display()
     
     def _on_card_selected(self, event=None):
-        """Maneja la selección de una carta"""
+        """Handles card selection"""
         selection = self.collection_tree.selection()
         if selection:
             item = self.collection_tree.item(selection[0])
@@ -348,24 +348,24 @@ class CollectionView:
             self.add_card_var.set(card_name)
     
     def _on_card_double_click(self, event=None):
-        """Maneja doble clic en una carta"""
+        """Handles double click on a card"""
         self._edit_quantity()
     
     def _edit_quantity(self):
-        """Edita la cantidad de una carta seleccionada"""
+        """Edits the quantity of a selected card"""
         selection = self.collection_tree.selection()
         if not selection:
-            messagebox.showwarning("Advertencia", "Selecciona una carta")
+            messagebox.showwarning("Warning", "Select a card")
             return
         
         item = self.collection_tree.item(selection[0])
         card_name = item['values'][1]
         current_quantity = item['values'][0]
         
-        # Diálogo para nueva cantidad
+        # Dialog for new quantity
         new_quantity = tk.simpledialog.askinteger(
-            "Editar Cantidad",
-            f"Nueva cantidad para {card_name}:",
+            "Edit Quantity",
+            f"New quantity for {card_name}:",
             initialvalue=current_quantity,
             minvalue=0,
             maxvalue=99
@@ -380,82 +380,82 @@ class CollectionView:
             self._update_collection_display()
     
     def _view_card_details(self):
-        """Muestra detalles de la carta seleccionada"""
-        messagebox.showinfo("Info", "Función en desarrollo: Ver detalles de carta")
+        """Shows details of the selected card"""
+        messagebox.showinfo("Info", "Function under development: View card details")
     
     def _remove_selected_card(self):
-        """Elimina la carta seleccionada de la colección"""
+        """Removes the selected card from the collection"""
         selection = self.collection_tree.selection()
         if not selection:
-            messagebox.showwarning("Advertencia", "Selecciona una carta")
+            messagebox.showwarning("Warning", "Select a card")
             return
         
         item = self.collection_tree.item(selection[0])
         card_name = item['values'][1]
         
-        result = messagebox.askyesno("Confirmar", f"¿Eliminar {card_name} de la colección?")
+        result = messagebox.askyesno("Confirm", f"Remove {card_name} from collection?")
         if result:
             del self.collection_cards[card_name]
             self._update_collection_display()
     
     def _import_collection(self):
-        """Importa una colección desde archivo"""
+        """Imports a collection from file"""
         file_path = filedialog.askopenfilename(
-            title="Importar Colección",
-            filetypes=[("Archivos de texto", "*.txt"), ("Archivos CSV", "*.csv"), ("Todos los archivos", "*.*")]
+            title="Import Collection",
+            filetypes=[("Text files", "*.txt"), ("CSV files", "*.csv"), ("All files", "*.*")]
         )
         
         if file_path:
             # TODO: Implementar importación
-            messagebox.showinfo("Info", "Función en desarrollo: Importar colección")
+            messagebox.showinfo("Info", "Function under development: Import collection")
     
     def _export_collection(self):
-        """Exporta la colección a archivo"""
+        """Exports the collection to file"""
         if not self.collection_cards:
-            messagebox.showwarning("Advertencia", "La colección está vacía")
+            messagebox.showwarning("Warning", "Collection is empty")
             return
         
         file_path = filedialog.asksaveasfilename(
-            title="Exportar Colección",
+            title="Export Collection",
             defaultextension=".txt",
-            filetypes=[("Archivos de texto", "*.txt"), ("Archivos CSV", "*.csv"), ("Todos los archivos", "*.*")]
+            filetypes=[("Text files", "*.txt"), ("CSV files", "*.csv"), ("All files", "*.*")]
         )
         
         if file_path:
             # TODO: Implementar exportación
-            messagebox.showinfo("Info", "Función en desarrollo: Exportar colección")
+            messagebox.showinfo("Info", "Function under development: Export collection")
     
     def _clear_collection(self):
-        """Limpia toda la colección"""
+        """Clears the entire collection"""
         if not self.collection_cards:
-            messagebox.showinfo("Info", "La colección ya está vacía")
+            messagebox.showinfo("Info", "Collection is already empty")
             return
         
-        result = messagebox.askyesno("Confirmar", "¿Estás seguro de que quieres limpiar toda la colección?")
+        result = messagebox.askyesno("Confirm", "Are you sure you want to clear the entire collection?")
         if result:
             self.collection_cards.clear()
             self._update_collection_display()
-            messagebox.showinfo("Éxito", "Colección limpiada")
+            messagebox.showinfo("Success", "Collection cleared")
     
     def show(self):
-        """Muestra la vista"""
+        """Shows the view"""
         if self.frame:
             self.frame.pack(fill=tk.BOTH, expand=True)
     
     def hide(self):
-        """Oculta la vista"""
+        """Hides the view"""
         if self.frame:
             self.frame.pack_forget()
     
     def refresh(self):
-        """Refresca la vista"""
+        """Refreshes the view"""
         self._update_collection_display()
     
     def get_collection(self) -> Dict[str, int]:
-        """Obtiene la colección actual"""
+        """Gets the current collection"""
         return self.collection_cards.copy()
     
     def set_collection(self, collection: Dict[str, int]):
-        """Establece la colección"""
+        """Sets the collection"""
         self.collection_cards = collection.copy()
         self._update_collection_display()

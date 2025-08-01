@@ -1,4 +1,4 @@
-"""Modelo de datos para mazos MTG"""
+"""Data model for MTG decks"""
 
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional
@@ -9,7 +9,7 @@ from .card import Card
 
 @dataclass
 class Deck:
-    """Representa un mazo de Magic: The Gathering"""
+    """Represents a Magic: The Gathering deck"""
     
     name: str
     cards: List[Card] = field(default_factory=list)
@@ -17,7 +17,7 @@ class Deck:
     description: Optional[str] = None
     
     def add_card(self, card: Card, quantity: int = 1) -> None:
-        """Añade una carta al mazo"""
+        """Adds a card to the deck"""
         existing_card = self.find_card(card.card_name)
         if existing_card:
             existing_card.quantity += quantity
@@ -27,7 +27,7 @@ class Deck:
             self.cards.append(new_card)
     
     def remove_card(self, card_name: str, quantity: int = 1) -> bool:
-        """Elimina una cantidad específica de una carta del mazo"""
+        """Removes a specific quantity of a card from the deck"""
         card = self.find_card(card_name)
         if card and card.quantity >= quantity:
             card.quantity -= quantity
@@ -37,7 +37,7 @@ class Deck:
         return False
     
     def find_card(self, card_name: str) -> Optional[Card]:
-        """Busca una carta en el mazo por nombre"""
+        """Searches for a card in the deck by name"""
         for card in self.cards:
             if card.card_name == card_name or card.english_card_name == card_name:
                 return card
@@ -45,17 +45,17 @@ class Deck:
     
     @property
     def total_cards(self) -> int:
-        """Número total de cartas en el mazo"""
+        """Total number of cards in the deck"""
         return sum(card.quantity for card in self.cards)
     
     @property
     def unique_cards(self) -> int:
-        """Número de cartas únicas en el mazo"""
+        """Number of unique cards in the deck"""
         return len(self.cards)
     
     @property
     def color_distribution(self) -> Dict[str, int]:
-        """Distribución de colores en el mazo"""
+        """Color distribution in the deck"""
         color_count = Counter()
         for card in self.cards:
             for color in card.color_identity:
@@ -64,7 +64,7 @@ class Deck:
     
     @property
     def mana_curve(self) -> Dict[int, int]:
-        """Curva de maná del mazo"""
+        """Mana curve of the deck"""
         curve = Counter()
         for card in self.cards:
             cmc = card.converted_mana_cost
@@ -73,23 +73,23 @@ class Deck:
     
     @property
     def type_distribution(self) -> Dict[str, int]:
-        """Distribución de tipos de carta"""
+        """Card type distribution"""
         type_count = Counter()
         for card in self.cards:
             if card.type_line:
-                # Simplificado - extraer tipo principal
+                # Simplified - extract main type
                 main_type = card.type_line.split(' — ')[0].split(' ')[-1]
                 type_count[main_type] += card.quantity
         return dict(type_count)
     
     def get_cards_by_type(self, card_type: str) -> List[Card]:
-        """Obtiene todas las cartas de un tipo específico"""
+        """Gets all cards of a specific type"""
         return [card for card in self.cards 
                 if card.type_line and card_type.lower() in card.type_line.lower()]
     
     def is_legal_format(self, format_name: str) -> bool:
-        """Verifica si el mazo es legal en un formato específico (simplificado)"""
-        # Implementación básica - en un proyecto real sería más compleja
+        """Checks if the deck is legal in a specific format (simplified)"""
+        # Basic implementation - in a real project it would be more complex
         format_rules = {
             'commander': {'min_cards': 100, 'max_cards': 100},
             'standard': {'min_cards': 60, 'max_cards': None},
@@ -110,7 +110,7 @@ class Deck:
         return True
     
     def to_dict(self) -> dict:
-        """Convierte el mazo a diccionario para serialización"""
+        """Converts the deck to dictionary for serialization"""
         return {
             'name': self.name,
             'format': self.format,
@@ -120,7 +120,7 @@ class Deck:
     
     @classmethod
     def from_dict(cls, data: dict) -> 'Deck':
-        """Crea un mazo desde un diccionario"""
+        """Creates a deck from a dictionary"""
         deck = cls(
             name=data.get('name', ''),
             format=data.get('format'),

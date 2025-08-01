@@ -1,63 +1,63 @@
 # Changelog
 
-Todos los cambios notables de este proyecto serán documentados en este archivo.
+All notable changes to this project will be documented in this file.
 
-El formato está basado en [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
 ### Added
-- Documentación completa del proyecto
-- Guía de instalación y configuración
-- Documentación de API y arquitectura
-- Guía de desarrollo y contribución
-- Suite de tests completa con 66.7% de éxito
-- Configuración de .gitignore mejorada
+- Complete project documentation
+- Installation and configuration guide
+- API and architecture documentation
+- Development and contribution guide
+- Complete test suite with 66.7% success rate
+- Improved .gitignore configuration
 
 ### Changed
-- Reestructuración completa de la arquitectura del proyecto
-- Migración a patrón MVC con servicios
-- Mejora significativa en la cobertura de tests
+- Complete restructuring of project architecture
+- Migration to MVC pattern with services
+- Significant improvement in test coverage
 
 ### Fixed
-- Corrección de inicialización de servicios en tests
-- Alineación de métodos de controladores con implementación real
-- Corrección de signatures de métodos en tests
-- Fixes en modelos de datos (Card y Deck)
+- Fixed service initialization in tests
+- Aligned controller methods with real implementation
+- Fixed method signatures in tests
+- Fixes in data models (Card and Deck)
 
 ## [1.0.0] - 2025-01-31
 
 ### Added
-- Implementación inicial del MTG Deck Constructor
-- Arquitectura MVC con servicios separados
-- Modelos para Card y Deck
-- Servicios para gestión de cartas, mazos, imágenes y Scryfall
-- Controladores para aplicación, cartas y mazos
-- Interfaz gráfica con tkinter
-- Sistema de cache para imágenes
-- Integración con API de Scryfall
-- Soporte para múltiples formatos de Magic (Standard, Modern, etc.)
-- Funcionalidades de búsqueda y filtrado de cartas
-- Constructor de mazos con validación
-- Exportación e importación de mazos
-- Análisis estadístico de mazos
-- Sistema de logging
-- Configuración mediante archivo JSON
+- Initial implementation of MTG Deck Constructor
+- MVC architecture with separate services
+- Models for Card and Deck
+- Services for card, deck, image and Scryfall management
+- Controllers for application, cards and decks
+- Graphical interface with tkinter
+- Image cache system
+- Scryfall API integration
+- Support for multiple Magic formats (Standard, Modern, etc.)
+- Card search and filtering functionalities
+- Deck builder with validation
+- Deck export and import
+- Statistical deck analysis
+- Logging system
+- JSON file configuration
 
 ### Technical Details
 - Python 3.8+ compatible
-- Arquitectura modular y testeable
-- Separación clara de responsabilidades
-- Inyección de dependencias
-- Manejo de errores robusto
-- Cache inteligente de recursos
+- Modular and testable architecture
+- Robust error handling
+- Inline code documentation
+- Flexible JSON configuration
 
-## Tipos de Cambios
+---
 
-- `Added` para nuevas funcionalidades
-- `Changed` para cambios en funcionalidades existentes
-- `Deprecated` para funcionalidades que serán removidas
-- `Removed` para funcionalidades removidas
-- `Fixed` para corrección de bugs
-- `Security` para vulnerabilidades de seguridad
+## Types of Changes
+- `Added` for new features
+- `Changed` for changes in existing functionality
+- `Deprecated` for features that will be removed
+- `Removed` for removed features
+- `Fixed` for bug fixes
+- `Security` for security vulnerabilities

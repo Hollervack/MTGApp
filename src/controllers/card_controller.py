@@ -1,4 +1,4 @@
-"""Controlador para gestión de cartas MTG"""
+"""Controller for MTG card management"""
 
 import logging
 from typing import List, Dict, Any, Optional
@@ -11,7 +11,7 @@ from ..services.image_service import ImageService
 
 
 class CardController:
-    """Controlador para operaciones con cartas"""
+    """Controller for card operations"""
     
     def __init__(self, card_service: CardService, scryfall_service: ScryfallService, 
                  image_service: ImageService):
@@ -22,82 +22,82 @@ class CardController:
         self._search_cache = {}
     
     def search_cards(self, query: str, limit: int = 50) -> List[Card]:
-        """Busca cartas por nombre"""
+        """Searches for cards by name"""
         try:
-            # Verificar caché
+            # Check cache
             cache_key = f"{query.lower()}_{limit}"
             if cache_key in self._search_cache:
                 return self._search_cache[cache_key]
             
             results = self.card_service.search_cards(query)
             
-            # Limitar resultados
+            # Limit results
             if limit > 0:
                 results = results[:limit]
             
-            # Guardar en caché
+            # Save to cache
             self._search_cache[cache_key] = results
             
-            self.logger.info(f"Búsqueda '{query}': {len(results)} resultados")
+            self.logger.info(f"Search '{query}': {len(results)} results")
             return results
         except Exception as e:
-            self.logger.error(f"Error en búsqueda de cartas: {e}")
+            self.logger.error(f"Error in card search: {e}")
             return []
     
     def get_card_by_name(self, name: str) -> Optional[Card]:
-        """Obtiene una carta específica por nombre exacto"""
+        """Gets a specific card by exact name"""
         try:
             return self.card_service.find_card_by_name(name)
         except Exception as e:
-            self.logger.error(f"Error al obtener carta {name}: {e}")
+            self.logger.error(f"Error getting card {name}: {e}")
             return None
     
     def get_cards_by_color(self, colors: List[str]) -> List[Card]:
-        """Obtiene cartas por colores"""
+        """Gets cards by colors"""
         try:
             all_cards = self.card_service.load_cards()
             return self.card_service.filter_by_color(all_cards, colors)
         except Exception as e:
-            self.logger.error(f"Error al filtrar por colores: {e}")
+            self.logger.error(f"Error filtering by colors: {e}")
             return []
     
     def get_cards_by_type(self, card_type: str) -> List[Card]:
-        """Obtiene cartas por tipo"""
+        """Gets cards by type"""
         try:
             all_cards = self.card_service.load_cards()
             return self.card_service.filter_by_type(all_cards, card_type)
         except Exception as e:
-            self.logger.error(f"Error al filtrar por tipo: {e}")
+            self.logger.error(f"Error filtering by type: {e}")
             return []
     
     def get_cards_by_rarity(self, rarity: str) -> List[Card]:
-        """Obtiene cartas por rareza"""
+        """Gets cards by rarity"""
         try:
             all_cards = self.card_service.load_cards()
             return self.card_service.filter_by_rarity(all_cards, rarity)
         except Exception as e:
-            self.logger.error(f"Error al filtrar por rareza: {e}")
+            self.logger.error(f"Error filtering by rarity: {e}")
             return []
     
     def get_cards_by_set(self, set_code: str) -> List[Card]:
-        """Obtiene cartas por set"""
+        """Gets cards by set"""
         try:
             all_cards = self.card_service.load_cards()
             return self.card_service.filter_by_set(all_cards, set_code)
         except Exception as e:
-            self.logger.error(f"Error al filtrar por set: {e}")
+            self.logger.error(f"Error filtering by set: {e}")
             return []
     
     def advanced_search(self, filters: Dict[str, Any]) -> List[Card]:
-        """Búsqueda avanzada con múltiples filtros"""
+        """Advanced search with multiple filters"""
         try:
-            # Comenzar con todas las cartas o con una búsqueda de texto
+            # Start with all cards or with a text search
             if 'query' in filters and filters['query']:
                 results = self.search_cards(filters['query'], limit=0)
             else:
                 results = self.card_service.load_cards()
             
-            # Aplicar filtros
+            # Apply filters
             if 'colors' in filters and filters['colors']:
                 results = self.card_service.filter_by_color(results, filters['colors'])
             
@@ -110,7 +110,7 @@ class CardController:
             if 'set' in filters and filters['set']:
                 results = self.card_service.filter_by_set(results, filters['set'])
             
-            # Filtros adicionales
+            # Additional filters
             if 'min_cmc' in filters:
                 results = [card for card in results 
                           if card.get_simplified_cmc() >= filters['min_cmc']]
@@ -122,7 +122,7 @@ class CardController:
             if 'creatures_only' in filters and filters['creatures_only']:
                 results = [card for card in results if card.is_creature()]
             
-            # Ordenar resultados
+            # Sort results
             sort_by = filters.get('sort_by', 'name')
             reverse = filters.get('sort_desc', False)
             
@@ -135,84 +135,84 @@ class CardController:
                 results.sort(key=lambda c: rarity_order.get(c.rarity.lower() if c.rarity else '', 0), 
                            reverse=reverse)
             
-            # Limitar resultados
+            # Limit results
             limit = filters.get('limit', 100)
             if limit > 0:
                 results = results[:limit]
             
-            self.logger.info(f"Búsqueda avanzada: {len(results)} resultados")
+            self.logger.info(f"Advanced search: {len(results)} results")
             return results
         except Exception as e:
-            self.logger.error(f"Error en búsqueda avanzada: {e}")
+            self.logger.error(f"Error in advanced search: {e}")
             return []
     
     def get_card_image(self, card: Card, size: str = 'normal') -> Optional[str]:
-        """Obtiene la imagen de una carta"""
+        """Gets the image of a card"""
         try:
-            # Intentar obtener desde caché
+            # Try to get from cache
             image_path = self.image_service.get_image(card.card_name, size)
             
             if image_path and Path(image_path).exists():
                 return image_path
             
-            # Si no está en caché, intentar descargar
+            # If not in cache, try to download
             return self._download_card_image(card, size)
         except Exception as e:
-            self.logger.error(f"Error al obtener imagen de {card.card_name}: {e}")
+            self.logger.error(f"Error getting image of {card.card_name}: {e}")
             return None
     
     def _download_card_image(self, card: Card, size: str = 'normal') -> Optional[str]:
-        """Descarga la imagen de una carta desde Scryfall"""
+        """Downloads the image of a card from Scryfall"""
         try:
-            # Buscar carta en Scryfall
+            # Search for card in Scryfall
             scryfall_card = self.scryfall_service.get_card_by_name(card.card_name)
             
             if not scryfall_card:
-                self.logger.warning(f"Carta no encontrada en Scryfall: {card.card_name}")
+                self.logger.warning(f"Card not found in Scryfall: {card.card_name}")
                 return None
             
-            # Obtener URL de imagen
+            # Get image URL
             image_uris = scryfall_card.get('image_uris', {})
             if not image_uris:
-                # Cartas de doble cara pueden tener imágenes en card_faces
+                # Double-faced cards may have images in card_faces
                 card_faces = scryfall_card.get('card_faces', [])
                 if card_faces and 'image_uris' in card_faces[0]:
                     image_uris = card_faces[0]['image_uris']
             
             if not image_uris:
-                self.logger.warning(f"No se encontraron imágenes para {card.card_name}")
+                self.logger.warning(f"No images found for {card.card_name}")
                 return None
             
-            # Seleccionar tamaño de imagen
+            # Select image size
             image_url = image_uris.get(size)
             if not image_url:
-                # Fallback a tamaño normal si el solicitado no está disponible
+                # Fallback to normal size if requested is not available
                 image_url = image_uris.get('normal')
             
             if not image_url:
-                self.logger.warning(f"URL de imagen no disponible para {card.card_name}")
+                self.logger.warning(f"Image URL not available for {card.card_name}")
                 return None
             
-            # Descargar imagen
+            # Download image
             downloaded_path = self.image_service.download_image(
                 image_url, card.card_name, size
             )
             
             if downloaded_path:
-                self.logger.info(f"Imagen descargada: {card.card_name}")
+                self.logger.info(f"Image downloaded: {card.card_name}")
             
             return downloaded_path
         except Exception as e:
-            self.logger.error(f"Error al descargar imagen de {card.card_name}: {e}")
+            self.logger.error(f"Error downloading image of {card.card_name}: {e}")
             return None
     
     def preload_images(self, cards: List[Card], size: str = 'normal', 
                       max_concurrent: int = 5) -> Dict[str, bool]:
-        """Precarga imágenes de múltiples cartas"""
+        """Preloads images of multiple cards"""
         try:
             results = {}
             
-            # Filtrar cartas que ya tienen imagen en caché
+            # Filter cards that already have image in cache
             cards_to_download = []
             for card in cards:
                 cached_path = self.image_service.get_image(card.card_name, size)
@@ -221,110 +221,110 @@ class CardController:
                 else:
                     cards_to_download.append(card)
             
-            # Descargar imágenes faltantes
+            # Download missing images
             for card in cards_to_download:
                 try:
                     image_path = self._download_card_image(card, size)
                     results[card.card_name] = image_path is not None
                 except Exception as e:
-                    self.logger.error(f"Error al precargar imagen de {card.card_name}: {e}")
+                    self.logger.error(f"Error preloading image of {card.card_name}: {e}")
                     results[card.card_name] = False
             
             successful = sum(1 for success in results.values() if success)
-            self.logger.info(f"Precarga completada: {successful}/{len(cards)} imágenes")
+            self.logger.info(f"Preload completed: {successful}/{len(cards)} images")
             
             return results
         except Exception as e:
-            self.logger.error(f"Error en precarga de imágenes: {e}")
+            self.logger.error(f"Error in image preload: {e}")
             return {}
     
     def get_card_details_from_scryfall(self, card_name: str) -> Optional[Dict[str, Any]]:
-        """Obtiene detalles completos de una carta desde Scryfall"""
+        """Gets complete details of a card from Scryfall"""
         try:
             return self.scryfall_service.get_card_by_name(card_name)
         except Exception as e:
-            self.logger.error(f"Error al obtener detalles de Scryfall para {card_name}: {e}")
+            self.logger.error(f"Error getting Scryfall details for {card_name}: {e}")
             return None
     
     def get_card_rulings(self, card_name: str) -> List[Dict[str, Any]]:
-        """Obtiene las reglas/aclaraciones de una carta"""
+        """Gets the rules/clarifications of a card"""
         try:
             return self.scryfall_service.get_card_rulings(card_name)
         except Exception as e:
-            self.logger.error(f"Error al obtener reglas para {card_name}: {e}")
+            self.logger.error(f"Error getting rules for {card_name}: {e}")
             return []
     
     def get_available_sets(self) -> List[str]:
-        """Obtiene lista de sets disponibles"""
+        """Gets list of available sets"""
         try:
             return self.card_service.get_available_sets()
         except Exception as e:
-            self.logger.error(f"Error al obtener sets disponibles: {e}")
+            self.logger.error(f"Error getting available sets: {e}")
             return []
     
     def get_available_types(self) -> List[str]:
-        """Obtiene lista de tipos disponibles"""
+        """Gets list of available types"""
         try:
             return self.card_service.get_available_types()
         except Exception as e:
-            self.logger.error(f"Error al obtener tipos disponibles: {e}")
+            self.logger.error(f"Error getting available types: {e}")
             return []
     
     def get_collection_stats(self) -> Dict[str, Any]:
-        """Obtiene estadísticas de la colección"""
+        """Gets collection statistics"""
         try:
             return self.card_service.get_collection_stats()
         except Exception as e:
-            self.logger.error(f"Error al obtener estadísticas: {e}")
+            self.logger.error(f"Error getting statistics: {e}")
             return {}
     
     def update_card_quantity(self, card_name: str, new_quantity: int) -> bool:
-        """Actualiza la cantidad de una carta en la colección"""
+        """Updates the quantity of a card in the collection"""
         try:
             card = self.card_service.find_card_by_name(card_name)
             if not card:
-                self.logger.warning(f"Carta no encontrada: {card_name}")
+                self.logger.warning(f"Card not found: {card_name}")
                 return False
             
             old_quantity = card.quantity
-            card.quantity = max(0, new_quantity)  # No permitir cantidades negativas
+            card.quantity = max(0, new_quantity)  # Don't allow negative quantities
             
-            # Aquí se podría implementar la persistencia de cambios
-            # Por ahora solo actualizamos en memoria
+            # Here persistence of changes could be implemented
+            # For now we only update in memory
             
-            self.logger.info(f"Cantidad actualizada para {card_name}: {old_quantity} -> {new_quantity}")
+            self.logger.info(f"Quantity updated for {card_name}: {old_quantity} -> {new_quantity}")
             return True
         except Exception as e:
-            self.logger.error(f"Error al actualizar cantidad: {e}")
+            self.logger.error(f"Error updating quantity: {e}")
             return False
     
     def clear_search_cache(self):
-        """Limpia la caché de búsquedas"""
+        """Clears the search cache"""
         self._search_cache.clear()
-        self.logger.info("Caché de búsquedas limpiada")
+        self.logger.info("Search cache cleared")
     
     def get_random_cards(self, count: int = 10, filters: Optional[Dict[str, Any]] = None) -> List[Card]:
-        """Obtiene cartas aleatorias"""
+        """Gets random cards"""
         try:
             import random
             
-            # Obtener todas las cartas o aplicar filtros
+            # Get all cards or apply filters
             if filters:
                 cards = self.advanced_search(filters)
             else:
                 cards = self.card_service.load_cards()
             
-            # Seleccionar aleatoriamente
+            # Select randomly
             if len(cards) <= count:
                 return cards
             
             return random.sample(cards, count)
         except Exception as e:
-            self.logger.error(f"Error al obtener cartas aleatorias: {e}")
+            self.logger.error(f"Error getting random cards: {e}")
             return []
     
     def get_similar_cards(self, card: Card, limit: int = 10) -> List[Card]:
-        """Obtiene cartas similares basadas en tipo y coste de maná"""
+        """Gets similar cards based on type and mana cost"""
         try:
             all_cards = self.card_service.load_cards()
             similar_cards = []
@@ -338,19 +338,19 @@ class CardController:
                 
                 score = 0
                 
-                # Puntuación por CMC similar
+                # Score for similar CMC
                 other_cmc = other_card.get_simplified_cmc()
                 if abs(card_cmc - other_cmc) <= 1:
                     score += 3
                 elif abs(card_cmc - other_cmc) <= 2:
                     score += 1
                 
-                # Puntuación por tipos compartidos
+                # Score for shared types
                 other_types = other_card.type_line.lower().split() if other_card.type_line else []
                 shared_types = set(card_types) & set(other_types)
                 score += len(shared_types) * 2
                 
-                # Puntuación por colores compartidos
+                # Score for shared colors
                 if card.colors and other_card.colors:
                     shared_colors = set(card.colors) & set(other_card.colors)
                     score += len(shared_colors)
@@ -358,9 +358,9 @@ class CardController:
                 if score > 0:
                     similar_cards.append((other_card, score))
             
-            # Ordenar por puntuación y devolver los mejores
+            # Sort by score and return the best
             similar_cards.sort(key=lambda x: x[1], reverse=True)
             return [card for card, score in similar_cards[:limit]]
         except Exception as e:
-            self.logger.error(f"Error al obtener cartas similares: {e}")
+            self.logger.error(f"Error getting similar cards: {e}")
             return []

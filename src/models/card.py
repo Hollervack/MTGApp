@@ -1,4 +1,4 @@
-"""Modelo de datos para cartas MTG"""
+"""Data model for MTG cards"""
 
 from dataclasses import dataclass
 from typing import Optional, List
@@ -6,7 +6,7 @@ from typing import Optional, List
 
 @dataclass
 class Card:
-    """Representa una carta de Magic: The Gathering"""
+    """Represents a Magic: The Gathering card"""
     
     card_name: str
     english_card_name: Optional[str] = None
@@ -25,7 +25,7 @@ class Card:
     image_url: Optional[str] = None
     
     def __post_init__(self):
-        """Validación y normalización de datos después de la inicialización"""
+        """Validation and data normalization after initialization"""
         if self.colors is None:
             self.colors = []
         if self.color_identity is None:
@@ -33,26 +33,26 @@ class Card:
     
     @property
     def display_name(self) -> str:
-        """Nombre para mostrar en la interfaz"""
+        """Name to display in the interface"""
         return self.english_card_name or self.card_name
     
     @property
     def is_creature(self) -> bool:
-        """Verifica si la carta es una criatura"""
+        """Checks if the card is a creature"""
         return self.type_line and 'Creature' in self.type_line
     
     @property
     def converted_mana_cost(self) -> int:
-        """Calcula el coste de maná convertido (simplificado)"""
+        """Calculates the converted mana cost (simplified)"""
         if not self.mana_cost:
             return 0
-        # Implementación simplificada - en un proyecto real sería más compleja
+        # Simplified implementation - in a real project it would be more complex
         import re
         numbers = re.findall(r'\d+', self.mana_cost)
         return sum(int(n) for n in numbers) + len(re.findall(r'[WUBRG]', self.mana_cost))
     
     def to_dict(self) -> dict:
-        """Convierte la carta a diccionario para serialización"""
+        """Converts the card to dictionary for serialization"""
         return {
             'card_name': self.card_name,
             'english_card_name': self.english_card_name,
@@ -73,7 +73,7 @@ class Card:
     
     @classmethod
     def from_dict(cls, data: dict) -> 'Card':
-        """Crea una carta desde un diccionario"""
+        """Creates a card from a dictionary"""
         return cls(
             card_name=data.get('card_name', ''),
             english_card_name=data.get('english_card_name'),

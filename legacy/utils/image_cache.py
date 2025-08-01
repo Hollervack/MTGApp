@@ -11,18 +11,18 @@ class ImageCache:
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         
     def _get_cache_filename(self, url):
-        """Genera un nombre de archivo único basado en la URL"""
+        """Generates a unique filename based on the URL"""
         url_hash = hashlib.md5(url.encode()).hexdigest()
         return self.cache_dir / f"{url_hash}.jpg"
     
     def get_image_from_cache_only(self, url, size=None):
-        """Obtiene una imagen SOLO desde caché, no descarga si no existe"""
+        """Gets an image ONLY from cache, does not download if it doesn't exist"""
         if not url:
             return None
             
         cache_file = self._get_cache_filename(url)
         
-        # Solo cargar si la imagen está en caché
+        # Only load if image is in cache
         if cache_file.exists():
             try:
                 image = Image.open(cache_file)
@@ -30,23 +30,23 @@ class ImageCache:
                     image.thumbnail(size, Image.Resampling.LANCZOS)
                 return ImageTk.PhotoImage(image)
             except Exception:
-                # Si hay error al cargar, eliminar archivo corrupto
+                # If there's an error loading, remove corrupted file
                 cache_file.unlink(missing_ok=True)
         
         return None
     
     def download_and_cache_image(self, url, size=None, timeout=10):
-        """Descarga y guarda una imagen en caché (solo para refrescar)"""
+        """Downloads and saves an image to cache (only for refreshing)"""
         if not url:
             return None
             
         cache_file = self._get_cache_filename(url)
         
-        # Descargar imagen
+        # Download image
         try:
             response = requests.get(url, timeout=timeout)
             if response.status_code == 200:
-                # Guardar imagen original en caché
+                # Save original image to cache
                 with open(cache_file, 'wb') as f:
                     f.write(response.content)
                 
@@ -61,11 +61,11 @@ class ImageCache:
         return None
     
     def get_image(self, url, size=None, timeout=10):
-        """Método de compatibilidad - ahora solo usa caché"""
+        """Compatibility method - now only uses cache"""
         return self.get_image_from_cache_only(url, size)
     
     def clear_cache(self):
-        """Limpia todo el caché de imágenes"""
+        """Clears all image cache"""
         try:
             for file in self.cache_dir.glob("*.jpg"):
                 file.unlink()
@@ -74,7 +74,7 @@ class ImageCache:
             return False
     
     def get_cache_size(self):
-        """Obtiene el tamaño del caché en MB"""
+        """Gets the cache size in MB"""
         try:
             total_size = sum(f.stat().st_size for f in self.cache_dir.glob("*.jpg"))
             return total_size / (1024 * 1024)  # Convertir a MB
@@ -82,7 +82,7 @@ class ImageCache:
             return 0
     
     def get_cache_count(self):
-        """Obtiene el número de imágenes en caché"""
+        """Gets the number of images in cache"""
         try:
             return len(list(self.cache_dir.glob("*.jpg")))
         except Exception:

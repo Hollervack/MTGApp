@@ -1,4 +1,4 @@
-"""Vista del navegador de cartas"""
+"""Card browser view"""
 
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -10,7 +10,7 @@ from ..models.card import Card
 
 
 class CardBrowserView:
-    """Vista para navegar y buscar cartas"""
+    """View for browsing and searching cards"""
     
     def __init__(self, parent: tk.Widget, app_controller: AppController):
         self.parent = parent
@@ -24,7 +24,7 @@ class CardBrowserView:
         self._load_initial_cards()
     
     def _create_interface(self):
-        """Crea la interfaz del navegador de cartas"""
+        """Creates the card browser interface"""
         # Frame principal
         self.frame = ttk.Frame(self.parent)
         self.frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
@@ -32,79 +32,79 @@ class CardBrowserView:
         # Panel superior - filtros y búsqueda
         self._create_search_panel()
         
-        # Panel central - lista de cartas
+        # Central panel - card list
         self._create_cards_panel()
         
-        # Panel inferior - detalles de carta
+        # Bottom panel - card details
         self._create_details_panel()
     
     def _create_search_panel(self):
-        """Crea el panel de búsqueda y filtros"""
-        search_frame = ttk.LabelFrame(self.frame, text="Búsqueda y Filtros")
+        """Creates the search and filters panel"""
+        search_frame = ttk.LabelFrame(self.frame, text="Search and Filters")
         search_frame.pack(fill=tk.X, pady=(0, 10))
         
-        # Primera fila - búsqueda principal
+        # First row - main search
         row1_frame = ttk.Frame(search_frame)
         row1_frame.pack(fill=tk.X, padx=5, pady=5)
         
-        ttk.Label(row1_frame, text="Buscar:").pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Label(row1_frame, text="Search:").pack(side=tk.LEFT, padx=(0, 5))
         self.search_var = tk.StringVar()
         search_entry = ttk.Entry(row1_frame, textvariable=self.search_var, width=30)
         search_entry.pack(side=tk.LEFT, padx=(0, 10))
         search_entry.bind('<KeyRelease>', self._on_search_changed)
         
-        ttk.Button(row1_frame, text="Buscar", command=self._perform_search).pack(side=tk.LEFT, padx=(0, 10))
-        ttk.Button(row1_frame, text="Limpiar", command=self._clear_search).pack(side=tk.LEFT)
+        ttk.Button(row1_frame, text="Search", command=self._perform_search).pack(side=tk.LEFT, padx=(0, 10))
+        ttk.Button(row1_frame, text="Clear", command=self._clear_search).pack(side=tk.LEFT)
         
-        # Segunda fila - filtros
+        # Second row - filters
         row2_frame = ttk.Frame(search_frame)
         row2_frame.pack(fill=tk.X, padx=5, pady=5)
         
-        # Filtro por color
+        # Color filter
         ttk.Label(row2_frame, text="Color:").pack(side=tk.LEFT, padx=(0, 5))
-        self.color_var = tk.StringVar(value="Todos")
+        self.color_var = tk.StringVar(value="All")
         color_combo = ttk.Combobox(row2_frame, textvariable=self.color_var, width=15,
-                                  values=["Todos", "Blanco", "Azul", "Negro", "Rojo", "Verde", "Incoloro", "Multicolor"])
+                                  values=["All", "White", "Blue", "Black", "Red", "Green", "Colorless", "Multicolor"])
         color_combo.pack(side=tk.LEFT, padx=(0, 10))
         color_combo.bind('<<ComboboxSelected>>', self._on_filter_changed)
         
-        # Filtro por tipo
-        ttk.Label(row2_frame, text="Tipo:").pack(side=tk.LEFT, padx=(0, 5))
-        self.type_var = tk.StringVar(value="Todos")
+        # Type filter
+        ttk.Label(row2_frame, text="Type:").pack(side=tk.LEFT, padx=(0, 5))
+        self.type_var = tk.StringVar(value="All")
         type_combo = ttk.Combobox(row2_frame, textvariable=self.type_var, width=15,
-                                 values=["Todos", "Criatura", "Instantáneo", "Conjuro", "Encantamiento", "Artefacto", "Planeswalker", "Tierra"])
+                                 values=["All", "Creature", "Instant", "Sorcery", "Enchantment", "Artifact", "Planeswalker", "Land"])
         type_combo.pack(side=tk.LEFT, padx=(0, 10))
         type_combo.bind('<<ComboboxSelected>>', self._on_filter_changed)
         
-        # Filtro por rareza
-        ttk.Label(row2_frame, text="Rareza:").pack(side=tk.LEFT, padx=(0, 5))
-        self.rarity_var = tk.StringVar(value="Todas")
+        # Rarity filter
+        ttk.Label(row2_frame, text="Rarity:").pack(side=tk.LEFT, padx=(0, 5))
+        self.rarity_var = tk.StringVar(value="All")
         rarity_combo = ttk.Combobox(row2_frame, textvariable=self.rarity_var, width=15,
-                                   values=["Todas", "Común", "Poco común", "Rara", "Mítica"])
+                                   values=["All", "Common", "Uncommon", "Rare", "Mythic"])
         rarity_combo.pack(side=tk.LEFT, padx=(0, 10))
         rarity_combo.bind('<<ComboboxSelected>>', self._on_filter_changed)
     
     def _create_cards_panel(self):
-        """Crea el panel de lista de cartas"""
-        cards_frame = ttk.LabelFrame(self.frame, text="Cartas")
+        """Creates the card list panel"""
+        cards_frame = ttk.LabelFrame(self.frame, text="Cards")
         cards_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
         
-        # Crear Treeview para mostrar cartas
+        # Create Treeview to display cards
         tree_frame = ttk.Frame(cards_frame)
         tree_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         
-        # Configurar columnas
+        # Configure columns
         columns = ('name', 'mana_cost', 'type', 'rarity', 'set')
         self.cards_tree = ttk.Treeview(tree_frame, columns=columns, show='headings', height=15)
         
-        # Configurar encabezados
-        self.cards_tree.heading('name', text='Nombre')
-        self.cards_tree.heading('mana_cost', text='Coste de Maná')
-        self.cards_tree.heading('type', text='Tipo')
-        self.cards_tree.heading('rarity', text='Rareza')
+        # Configure headers
+        self.cards_tree.heading('name', text='Name')
+        self.cards_tree.heading('mana_cost', text='Mana Cost')
+        self.cards_tree.heading('type', text='Type')
+        self.cards_tree.heading('rarity', text='Rarity')
         self.cards_tree.heading('set', text='Set')
         
-        # Configurar anchos de columna
+        # Configure column widths
         self.cards_tree.column('name', width=200)
         self.cards_tree.column('mana_cost', width=100)
         self.cards_tree.column('type', width=150)
@@ -116,39 +116,39 @@ class CardBrowserView:
         h_scrollbar = ttk.Scrollbar(tree_frame, orient=tk.HORIZONTAL, command=self.cards_tree.xview)
         self.cards_tree.configure(yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set)
         
-        # Empaquetar
+        # Pack
         self.cards_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         h_scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
         
-        # Bind eventos
+        # Bind events
         self.cards_tree.bind('<<TreeviewSelect>>', self._on_card_selected)
         self.cards_tree.bind('<Double-1>', self._on_card_double_click)
         
-        # Frame para información de resultados
+        # Frame for results information
         info_frame = ttk.Frame(cards_frame)
         info_frame.pack(fill=tk.X, padx=5, pady=(0, 5))
         
-        self.results_label = ttk.Label(info_frame, text="Cartas encontradas: 0")
+        self.results_label = ttk.Label(info_frame, text="Cards found: 0")
         self.results_label.pack(side=tk.LEFT)
     
     def _create_details_panel(self):
-        """Crea el panel de detalles de carta"""
-        details_frame = ttk.LabelFrame(self.frame, text="Detalles de la Carta")
+        """Creates the card details panel"""
+        details_frame = ttk.LabelFrame(self.frame, text="Card Details")
         details_frame.pack(fill=tk.X)
         
-        # Frame para imagen y texto
+        # Frame for image and text
         content_frame = ttk.Frame(details_frame)
         content_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         
-        # Frame izquierdo para imagen
+        # Left frame for image
         image_frame = ttk.Frame(content_frame)
         image_frame.pack(side=tk.LEFT, padx=(0, 10))
         
-        self.card_image_label = ttk.Label(image_frame, text="Imagen de carta\n(No disponible)")
+        self.card_image_label = ttk.Label(image_frame, text="Card image\n(Not available)")
         self.card_image_label.pack()
         
-        # Frame derecho para detalles
+        # Right frame for details
         text_frame = ttk.Frame(content_frame)
         text_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
@@ -160,24 +160,24 @@ class CardBrowserView:
         details_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
     
     def _load_initial_cards(self):
-        """Carga las cartas iniciales"""
+        """Loads initial cards"""
         try:
-            # Cargar todas las cartas (limitado para rendimiento)
-            all_cards = self.app_controller.get_all_cards()[:1000]  # Limitar a 1000
+            # Load all cards (limited for performance)
+            all_cards = self.app_controller.get_all_cards()[:1000]  # Limit to 1000
             self._update_cards_display(all_cards)
         except Exception as e:
-            self.logger.error(f"Error cargando cartas iniciales: {e}")
-            messagebox.showerror("Error", f"Error cargando cartas: {e}")
+            self.logger.error(f"Error loading initial cards: {e}")
+            messagebox.showerror("Error", f"Error loading cards: {e}")
     
     def _on_search_changed(self, event=None):
-        """Maneja cambios en tiempo real en la búsqueda"""
-        # Búsqueda en tiempo real solo si hay más de 2 caracteres
+        """Handles real-time changes in search"""
+        # Real-time search only if there are more than 2 characters
         search_term = self.search_var.get().strip()
         if len(search_term) >= 3:
             self._perform_search()
     
     def _perform_search(self):
-        """Realiza la búsqueda de cartas"""
+        """Performs card search"""
         try:
             search_term = self.search_var.get().strip()
             if not search_term:
@@ -188,46 +188,46 @@ class CardBrowserView:
             self._apply_filters(results)
             
         except Exception as e:
-            self.logger.error(f"Error en búsqueda: {e}")
-            messagebox.showerror("Error", f"Error en búsqueda: {e}")
+            self.logger.error(f"Search error: {e}")
+            messagebox.showerror("Error", f"Search error: {e}")
     
     def _on_filter_changed(self, event=None):
-        """Maneja cambios en los filtros"""
-        # Aplicar filtros a las cartas actuales
+        """Handles filter changes"""
+        # Apply filters to current cards
         if hasattr(self, 'current_cards'):
             self._apply_filters(self.current_cards)
     
     def _apply_filters(self, cards: List[Card]):
-        """Aplica los filtros seleccionados a la lista de cartas"""
+        """Applies selected filters to the card list"""
         filtered_cards = cards.copy()
         
-        # Filtro por color
+        # Color filter
         color_filter = self.color_var.get()
-        if color_filter != "Todos":
-            # Implementación básica del filtro de color
-            pass  # TODO: Implementar filtro de color
+        if color_filter != "All":
+            # Basic color filter implementation
+            pass  # TODO: Implement color filter
         
-        # Filtro por tipo
+        # Type filter
         type_filter = self.type_var.get()
-        if type_filter != "Todos":
-            # Implementación básica del filtro de tipo
-            pass  # TODO: Implementar filtro de tipo
+        if type_filter != "All":
+            # Basic type filter implementation
+            pass  # TODO: Implement type filter
         
-        # Filtro por rareza
+        # Rarity filter
         rarity_filter = self.rarity_var.get()
-        if rarity_filter != "Todas":
-            # Implementación básica del filtro de rareza
-            pass  # TODO: Implementar filtro de rareza
+        if rarity_filter != "All":
+            # Basic rarity filter implementation
+            pass  # TODO: Implement rarity filter
         
         self._update_cards_display(filtered_cards)
     
     def _update_cards_display(self, cards: List[Card]):
-        """Actualiza la visualización de cartas"""
-        # Limpiar árbol
+        """Updates the card display"""
+        # Clear tree
         for item in self.cards_tree.get_children():
             self.cards_tree.delete(item)
         
-        # Agregar cartas
+        # Add cards
         self.current_cards = cards
         for card in cards:
             self.cards_tree.insert('', tk.END, values=(
@@ -238,20 +238,20 @@ class CardBrowserView:
                 getattr(card, 'set_code', '')
             ))
         
-        # Actualizar contador
-        self.results_label.config(text=f"Cartas encontradas: {len(cards)}")
+        # Update counter
+        self.results_label.config(text=f"Cards found: {len(cards)}")
     
     def _on_card_selected(self, event=None):
-        """Maneja la selección de una carta"""
+        """Handles card selection"""
         selection = self.cards_tree.selection()
         if not selection:
             return
         
-        # Obtener datos de la carta seleccionada
+        # Get selected card data
         item = self.cards_tree.item(selection[0])
         card_name = item['values'][0]
         
-        # Buscar la carta en la lista actual
+        # Search for the card in current list
         selected_card = None
         for card in self.current_cards:
             if card.card_name == card_name:
@@ -262,35 +262,35 @@ class CardBrowserView:
             self._show_card_details(selected_card)
     
     def _on_card_double_click(self, event=None):
-        """Maneja doble clic en una carta"""
-        # Implementar acción de doble clic (ej: agregar a mazo)
-        messagebox.showinfo("Info", "Función en desarrollo: Agregar a mazo")
+        """Handles double click on a card"""
+        # Implement double click action (e.g.: add to deck)
+        messagebox.showinfo("Info", "Function under development: Add to deck")
     
     def _show_card_details(self, card: Card):
-        """Muestra los detalles de una carta"""
-        # Limpiar texto anterior
+        """Shows card details"""
+        # Clear previous text
         self.details_text.delete(1.0, tk.END)
         
-        # Mostrar información de la carta
-        details = f"Nombre: {card.card_name}\n"
-        details += f"Coste de Maná: {getattr(card, 'mana_cost', 'N/A')}\n"
-        details += f"Tipo: {getattr(card, 'type_line', 'N/A')}\n"
-        details += f"Rareza: {getattr(card, 'rarity', 'N/A')}\n"
+        # Show card information
+        details = f"Name: {card.card_name}\n"
+        details += f"Mana Cost: {getattr(card, 'mana_cost', 'N/A')}\n"
+        details += f"Type: {getattr(card, 'type_line', 'N/A')}\n"
+        details += f"Rarity: {getattr(card, 'rarity', 'N/A')}\n"
         details += f"Set: {getattr(card, 'set_code', 'N/A')}\n\n"
         
         if hasattr(card, 'oracle_text'):
-            details += f"Texto: {card.oracle_text}\n\n"
+            details += f"Text: {card.oracle_text}\n\n"
         
         if hasattr(card, 'power') and hasattr(card, 'toughness'):
-            details += f"Fuerza/Resistencia: {card.power}/{card.toughness}\n"
+            details += f"Power/Toughness: {card.power}/{card.toughness}\n"
         
         self.details_text.insert(1.0, details)
         
-        # TODO: Cargar imagen de la carta
-        self.card_image_label.config(text=f"Imagen de\n{card.card_name}\n(No disponible)")
+        # TODO: Load card image
+        self.card_image_label.config(text=f"Image of\n{card.card_name}\n(Not available)")
     
     def _clear_search(self):
-        """Limpia la búsqueda y filtros"""
+        """Clears search and filters"""
         self.search_var.set("")
         self.color_var.set("Todos")
         self.type_var.set("Todos")
@@ -298,12 +298,12 @@ class CardBrowserView:
         self._load_initial_cards()
     
     def show(self):
-        """Muestra la vista"""
+        """Shows the view"""
         if self.frame:
             self.frame.pack(fill=tk.BOTH, expand=True)
     
     def hide(self):
-        """Oculta la vista"""
+        """Hides the view"""
         if self.frame:
             self.frame.pack_forget()
     

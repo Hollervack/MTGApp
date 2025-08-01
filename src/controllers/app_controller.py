@@ -1,4 +1,4 @@
-"""Controlador principal de la aplicación MTG Deck Constructor"""
+"""Main controller for the MTG Deck Constructor application"""
 
 import logging
 from typing import Optional, List, Dict, Any
@@ -14,7 +14,7 @@ from ..models.card import Card
 
 
 class AppController:
-    """Controlador principal que coordina todos los servicios de la aplicación"""
+    """Main controller that coordinates all application services"""
     
     def __init__(self):
         self.settings = get_settings()
@@ -23,28 +23,28 @@ class AppController:
         self._ensure_directories()
     
     def _setup_logging(self):
-        """Configura el sistema de logging"""
+        """Configures the logging system"""
         log_level = getattr(logging, self.settings.get('logging.level', 'INFO'))
         
-        # Configurar formato
+        # Configure format
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         )
         
-        # Logger principal
+        # Main logger
         self.logger = logging.getLogger('MTGDeckConstructor')
         self.logger.setLevel(log_level)
         
-        # Limpiar handlers existentes
+        # Clear existing handlers
         self.logger.handlers.clear()
         
-        # Handler para consola
+        # Console handler
         if self.settings.get('logging.console_enabled', True):
             console_handler = logging.StreamHandler()
             console_handler.setFormatter(formatter)
             self.logger.addHandler(console_handler)
         
-        # Handler para archivo
+        # File handler
         if self.settings.get('logging.file_enabled', True):
             log_file = Path(self.settings.get('logging.file_path', 'logs/app.log'))
             log_file.parent.mkdir(parents=True, exist_ok=True)
@@ -53,38 +53,38 @@ class AppController:
             file_handler.setFormatter(formatter)
             self.logger.addHandler(file_handler)
         
-        self.logger.info(f"Iniciando {self.settings.app_name} v{self.settings.app_version}")
+        self.logger.info(f"Starting {self.settings.app_name} v{self.settings.app_version}")
     
     def _initialize_services(self):
-        """Inicializa todos los servicios"""
+        """Initializes all services"""
         try:
-            # Servicio de cartas
+            # Card service
             self.card_service = CardService(
                 data_path=self.settings.cards_file
             )
             
-            # Servicio de imágenes
+            # Image service
             self.image_service = ImageService(
                 cache_dir=self.settings.images_directory
             )
             
-            # Servicio de Scryfall
+            # Scryfall service
             self.scryfall_service = ScryfallService()
             
-            # Servicio de mazos
+            # Deck service
             self.deck_service = DeckService(
                 card_service=self.card_service,
                 decks_dir=self.settings.decks_directory
             )
             
-            self.logger.info("Servicios inicializados correctamente")
+            self.logger.info("Services initialized successfully")
             
         except Exception as e:
-            self.logger.error(f"Error al inicializar servicios: {e}")
+            self.logger.error(f"Error initializing services: {e}")
             raise
     
     def _ensure_directories(self):
-        """Asegura que existan todos los directorios necesarios"""
+        """Ensures all necessary directories exist"""
         directories = [
             self.settings.decks_directory,
             self.settings.cache_directory,
@@ -97,76 +97,76 @@ class AppController:
             Path(directory).mkdir(parents=True, exist_ok=True)
     
     def initialize_application(self) -> bool:
-        """Inicializa la aplicación y carga datos iniciales"""
+        """Initializes the application and loads initial data"""
         try:
-            self.logger.info("Inicializando aplicación...")
+            self.logger.info("Initializing application...")
             
-            # Cargar cartas
+            # Load cards
             cards = self.card_service.load_cards()
-            self.logger.info(f"Cargadas {len(cards)} cartas")
+            self.logger.info(f"Loaded {len(cards)} cards")
             
-            # Verificar conectividad con Scryfall (opcional)
+            # Verify Scryfall connectivity (optional)
             if self.settings.get('api.test_connection', False):
                 try:
                     test_card = self.scryfall_service.get_card_by_name("Lightning Bolt")
                     if test_card:
-                        self.logger.info("Conexión con Scryfall API verificada")
+                        self.logger.info("Scryfall API connection verified")
                 except Exception as e:
-                    self.logger.warning(f"No se pudo conectar con Scryfall API: {e}")
+                    self.logger.warning(f"Could not connect to Scryfall API: {e}")
             
-            self.logger.info("Aplicación inicializada correctamente")
+            self.logger.info("Application initialized successfully")
             return True
             
         except Exception as e:
-            self.logger.error(f"Error al inicializar aplicación: {e}")
+            self.logger.error(f"Error initializing application: {e}")
             return False
     
     def shutdown(self):
-        """Cierra la aplicación limpiamente"""
+        """Closes the application cleanly"""
         try:
-            self.logger.info("Cerrando aplicación...")
+            self.logger.info("Closing application...")
             
-            # Guardar configuraciones
+            # Save configurations
             self.settings.save()
             
-            # Limpiar caché si es necesario
+            # Clear cache if necessary
             if self.settings.get('images.clear_cache_on_exit', False):
                 self.image_service.clear_cache()
             
-            self.logger.info("Aplicación cerrada correctamente")
+            self.logger.info("Application closed successfully")
             
         except Exception as e:
-            self.logger.error(f"Error al cerrar aplicación: {e}")
+            self.logger.error(f"Error closing application: {e}")
     
-    # Métodos de acceso a servicios
+    # Service access methods
     def get_card_service(self) -> CardService:
-        """Obtiene el servicio de cartas"""
+        """Gets the card service"""
         return self.card_service
     
     def get_deck_service(self) -> DeckService:
-        """Obtiene el servicio de mazos"""
+        """Gets the deck service"""
         return self.deck_service
     
     def get_image_service(self) -> ImageService:
-        """Obtiene el servicio de imágenes"""
+        """Gets the image service"""
         return self.image_service
     
     def get_scryfall_service(self) -> ScryfallService:
-        """Obtiene el servicio de Scryfall"""
+        """Gets the Scryfall service"""
         return self.scryfall_service
     
     def get_settings(self):
-        """Obtiene las configuraciones"""
+        """Gets the configurations"""
         return self.settings
     
-    # Métodos de conveniencia para operaciones comunes
+    # Convenience methods for common operations
     def search_cards(self, query: str, filters: Optional[Dict[str, Any]] = None) -> List[Card]:
-        """Busca cartas con filtros opcionales"""
+        """Searches for cards with optional filters"""
         try:
             results = self.card_service.search_cards(query)
             
             if filters:
-                # Aplicar filtros adicionales
+                # Apply additional filters
                 if 'color' in filters:
                     results = self.card_service.filter_by_color(results, filters['color'])
                 
@@ -182,19 +182,19 @@ class AppController:
             return results
             
         except Exception as e:
-            self.logger.error(f"Error al buscar cartas: {e}")
+            self.logger.error(f"Error searching cards: {e}")
             return []
     
     def get_card_image(self, card: Card, size: str = 'normal') -> Optional[str]:
-        """Obtiene la imagen de una carta"""
+        """Gets the image of a card"""
         try:
-            # Intentar obtener desde caché primero
+            # Try to get from cache first
             image_path = self.image_service.get_image(card.card_name, size)
             
             if image_path and Path(image_path).exists():
                 return image_path
             
-            # Si no está en caché, intentar descargar desde Scryfall
+            # If not in cache, try to download from Scryfall
             if self.settings.auto_download_images:
                 scryfall_card = self.scryfall_service.get_card_by_name(card.card_name)
                 
@@ -211,17 +211,17 @@ class AppController:
             return None
             
         except Exception as e:
-            self.logger.error(f"Error al obtener imagen de carta {card.card_name}: {e}")
+            self.logger.error(f"Error getting card image {card.card_name}: {e}")
             return None
     
     def create_deck_from_list(self, deck_name: str, card_list: List[str], 
                              format: Optional[str] = None) -> Optional[Deck]:
-        """Crea un mazo desde una lista de nombres de cartas"""
+        """Creates a deck from a list of card names"""
         try:
             deck = self.deck_service.create_deck(deck_name, format)
             
             for card_entry in card_list:
-                # Parsear entrada (ej: "4x Lightning Bolt" o "Lightning Bolt")
+                # Parse entry (e.g.: "4x Lightning Bolt" or "Lightning Bolt")
                 parts = card_entry.strip().split(' ', 1)
                 
                 if len(parts) == 1:
@@ -236,22 +236,22 @@ class AppController:
                         quantity = 1
                         card_name = card_entry.strip()
                 
-                # Buscar carta
+                # Search for card
                 card = self.card_service.find_card_by_name(card_name)
                 
                 if card:
                     deck.add_card(card, quantity)
                 else:
-                    self.logger.warning(f"Carta no encontrada: {card_name}")
+                    self.logger.warning(f"Card not found: {card_name}")
             
             return deck
             
         except Exception as e:
-            self.logger.error(f"Error al crear mazo desde lista: {e}")
+            self.logger.error(f"Error creating deck from list: {e}")
             return None
     
     def get_application_stats(self) -> Dict[str, Any]:
-        """Obtiene estadísticas de la aplicación"""
+        """Gets application statistics"""
         try:
             stats = {
                 'app_info': {
@@ -269,5 +269,5 @@ class AppController:
             return stats
             
         except Exception as e:
-            self.logger.error(f"Error al obtener estadísticas: {e}")
+            self.logger.error(f"Error getting statistics: {e}")
             return {}

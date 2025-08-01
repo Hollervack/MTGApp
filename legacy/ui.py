@@ -1,89 +1,89 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 
-from logic.card_loader import cargar_cartas
+from logic.card_loader import load_cards
 from logic.scryfall import get_card_image
-from logic.deck_compare import cargar_baraja_edhrec, comparar_con_coleccion
-from utils.image_utils import descargar_imagen
+from logic.deck_compare import load_edhrec_deck, compare_with_collection
+from utils.image_utils import download_image
 
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Gestor de Cartas MTG - MVP")
+        self.title("MTG Card Manager - MVP")
         self.geometry("900x500")
 
-        self.cartas = cargar_cartas()
-        self.cartas_por_nombre = {c['card_name']: c for c in self.cartas}
-        nombres = sorted([nombre for nombre in self.cartas_por_nombre.keys() if nombre])
+        self.cards = load_cards()
+        self.cards_by_name = {c['card_name']: c for c in self.cards}
+        names = sorted([name for name in self.cards_by_name.keys() if name])
 
-        self.combo = ttk.Combobox(self, values=nombres, width=50)
+        self.combo = ttk.Combobox(self, values=names, width=50)
         self.combo.pack(pady=10)
 
-        self.boton = ttk.Button(self, text="Mostrar carta", command=self.mostrar_carta)
-        self.boton.pack(pady=5)
+        self.button = ttk.Button(self, text="Show card", command=self.show_card)
+        self.button.pack(pady=5)
 
-        self.boton_baraja = ttk.Button(self, text="Cargar baraja EDHREC", command=self.analizar_baraja)
-        self.boton_baraja.pack(pady=5)
+        self.deck_button = ttk.Button(self, text="Load EDHREC deck", command=self.analyze_deck)
+        self.deck_button.pack(pady=5)
 
-        self.label_imagen = tk.Label(self)
-        self.label_imagen.pack(pady=10)
+        self.image_label = tk.Label(self)
+        self.image_label.pack(pady=10)
 
-    def mostrar_carta(self):
-        nombre = self.combo.get()
-        if not nombre:
-            messagebox.showwarning("Aviso", "Selecciona una carta.")
+    def show_card(self):
+        name = self.combo.get()
+        if not name:
+            messagebox.showwarning("Warning", "Select a card.")
             return
 
-        carta = self.cartas_por_nombre.get(nombre)
-        if not carta:
-            messagebox.showerror("Error", "Carta no encontrada.")
+        card = self.cards_by_name.get(name)
+        if not card:
+            messagebox.showerror("Error", "Card not found.")
             return
 
-        uuid = carta['scryfall_uuid']
-        url_imagen = get_card_image(uuid)
-        if url_imagen:
-            img = descargar_imagen(url_imagen)
+        uuid = card['scryfall_uuid']
+        image_url = get_card_image(uuid)
+        if image_url:
+            img = download_image(image_url)
             if img:
-                self.label_imagen.configure(image=img)
-                self.label_imagen.image = img
+                self.image_label.configure(image=img)
+                self.image_label.image = img
             else:
-                messagebox.showerror("Error", "No se pudo descargar la imagen.")
+                messagebox.showerror("Error", "Could not download image.")
         else:
-            messagebox.showerror("Error", "No se encontró la imagen en Scryfall.")
+            messagebox.showerror("Error", "Image not found in Scryfall.")
 
-    def analizar_baraja(self):
+    def analyze_deck(self):
         filepath = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
         if not filepath:
             return
 
-        baraja = cargar_baraja_edhrec(filepath)
-        faltantes = comparar_con_coleccion(baraja, self.cartas)
+        deck = load_edhrec_deck(filepath)
+        missing = compare_with_collection(deck, self.cards)
 
-        if not faltantes:
-            messagebox.showinfo("Genial!", "¡Ya tienes todas las cartas de esta baraja!")
+        if not missing:
+            messagebox.showinfo("Great!", "You already have all cards from this deck!")
             return
 
-        ventana = tk.Toplevel(self)
-        ventana.title("Cartas que te faltan")
-        ventana.geometry("600x400")
+        window = tk.Toplevel(self)
+        window.title("Missing cards")
+        window.geometry("600x400")
 
-        tree = ttk.Treeview(ventana, columns=("Card", "Owned", "Needed", "Missing"), show='headings')
+        tree = ttk.Treeview(window, columns=("Card", "Owned", "Needed", "Missing"), show='headings')
         for col in ("Card", "Owned", "Needed", "Missing"):
             tree.heading(col, text=col)
             tree.column(col, width=140)
-        for carta in faltantes:
-            tree.insert('', 'end', values=(carta['Card'], carta['Owned'], carta['Needed'], carta['Missing']))
+        for card in missing:
+            tree.insert('', 'end', values=(card['Card'], card['Owned'], card['Needed'], card['Missing']))
         tree.pack(expand=True, fill='both', pady=10)
 
-        def guardar_csv():
-            salida = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
-            if salida:
+        def save_csv():
+            output = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
+            if output:
                 import csv
-                with open(salida, 'w', newline='', encoding='utf-8') as f:
+                with open(output, 'w', newline='', encoding='utf-8') as f:
                     writer = csv.DictWriter(f, fieldnames=['Card', 'Owned', 'Needed', 'Missing'])
                     writer.writeheader()
-                    writer.writerows(faltantes)
-                messagebox.showinfo("Guardado", "Lista de compra guardada correctamente.")
+                    writer.writerows(missing)
+                messagebox.showinfo("Saved", "Shopping list saved successfully.")
 
-        boton_guardar = ttk.Button(ventana, text="Guardar lista como CSV", command=guardar_csv)
-        boton_guardar.pack(pady=5)
+        save_button = ttk.Button(window, text="Save list as CSV", command=save_csv)
+        save_button.pack(pady=5)

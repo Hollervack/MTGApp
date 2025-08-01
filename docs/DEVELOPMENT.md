@@ -1,74 +1,74 @@
-# Guía de Desarrollo
+# Development Guide
 
-## Configuración del Entorno de Desarrollo
+## Development Environment Setup
 
-### Requisitos
+### Requirements
 
 - Python 3.8+
 - pip
 - Git
-- Editor de código (VS Code recomendado)
+- Code editor (VS Code recommended)
 
-### Configuración Inicial
+### Initial Setup
 
-1. **Clonar y configurar el proyecto:**
+1. **Clone and configure the project:**
    ```bash
-   git clone <URL_DEL_REPOSITORIO>
+   git clone <REPOSITORY_URL>
    cd MTGDeckConstructorApp
    python -m venv venv
-   source venv/bin/activate  # En macOS/Linux
+   source venv/bin/activate  # On macOS/Linux
    pip install -r requirements.txt
    ```
 
-2. **Instalar dependencias de desarrollo:**
+2. **Install development dependencies:**
    ```bash
    pip install pytest pytest-cov black flake8 mypy
    ```
 
-## Estructura del Código
+## Code Structure
 
-### Principios de Arquitectura
+### Architecture Principles
 
-- **Separación de responsabilidades**: Cada módulo tiene una responsabilidad específica
-- **Inyección de dependencias**: Los servicios se inyectan en los controladores
-- **Testabilidad**: Todo el código debe ser testeable unitariamente
-- **Modularidad**: Componentes independientes y reutilizables
+- **Separation of concerns**: Each module has a specific responsibility
+- **Dependency injection**: Services are injected into controllers
+- **Testability**: All code should be unit testable
+- **Modularity**: Independent and reusable components
 
-### Convenciones de Código
+### Code Conventions
 
-- **Estilo**: Seguir PEP 8
-- **Nombres**: snake_case para funciones y variables, PascalCase para clases
-- **Documentación**: Docstrings para todas las clases y métodos públicos
-- **Imports**: Organizados en orden: stdlib, third-party, local
+- **Style**: Follow PEP 8
+- **Names**: snake_case for functions and variables, PascalCase for classes
+- **Documentation**: Docstrings for all public classes and methods
+- **Imports**: Organized in order: stdlib, third-party, local
 
 ## Testing
 
-### Ejecutar Tests
+### Running Tests
 
 ```bash
-# Todos los tests
+# All tests
 python -m pytest
 
-# Tests específicos
+# Specific tests
 python -m pytest tests/test_services.py
 
-# Con cobertura
+# With coverage
 python -m pytest --cov=src
 
-# Usando el script personalizado
+# Using custom script
 python run_tests.py
 ```
 
-### Estructura de Tests
+### Test Structure
 
-- `tests/test_models.py`: Tests para modelos de datos
-- `tests/test_services.py`: Tests para servicios
-- `tests/test_controllers.py`: Tests para controladores
-- `tests/test_integration.py`: Tests de integración
+- `tests/test_models.py`: Tests for data models
+- `tests/test_services.py`: Tests for services
+- `tests/test_controllers.py`: Tests for controllers
+- `tests/test_integration.py`: Integration tests
 
-### Escribir Tests
+### Writing Tests
 
-#### Tests Unitarios
+#### Unit Tests
 
 ```python
 import unittest
@@ -90,11 +90,11 @@ class TestCardService(unittest.TestCase):
         self.assertIsInstance(result, list)
 ```
 
-#### Tests de Integración
+#### Integration Tests
 
 ```python
 def test_complete_workflow(self):
-    # Test que verifica el flujo completo de la aplicación
+    # Test that verifies the complete application flow
     deck = self.deck_controller.create_new_deck("Test Deck")
     self.deck_controller.add_card_to_deck("Lightning Bolt", 4)
     result = self.deck_controller.save_current_deck()
@@ -103,10 +103,10 @@ def test_complete_workflow(self):
 
 ### Mocking
 
-Usar mocks para:
-- Servicios externos (Scryfall API)
-- Operaciones de archivo
-- Bases de datos
+Use mocks for:
+- External services (Scryfall API)
+- File operations
+- Databases
 
 ```python
 @patch('src.services.card_service.CardService._load_cards_from_file')
@@ -115,60 +115,60 @@ def test_load_cards(self, mock_load):
     # Test implementation
 ```
 
-## Contribuir al Proyecto
+## Contributing to the Project
 
-### Flujo de Trabajo
+### Workflow
 
-1. **Fork del repositorio**
-2. **Crear rama feature:**
+1. **Fork the repository**
+2. **Create feature branch:**
    ```bash
-   git checkout -b feature/nueva-funcionalidad
+   git checkout -b feature/new-functionality
    ```
-3. **Desarrollar y testear**
-4. **Commit con mensajes descriptivos:**
+3. **Develop and test**
+4. **Commit with descriptive messages:**
    ```bash
-   git commit -m "feat: añadir búsqueda avanzada de cartas"
+   git commit -m "feat: add advanced card search"
    ```
-5. **Push y crear Pull Request**
+5. **Push and create Pull Request**
 
-### Convenciones de Commit
+### Commit Conventions
 
-- `feat:` Nueva funcionalidad
-- `fix:` Corrección de bug
-- `docs:` Cambios en documentación
-- `test:` Añadir o modificar tests
-- `refactor:` Refactorización de código
-- `style:` Cambios de formato
+- `feat:` New functionality
+- `fix:` Bug fix
+- `docs:` Documentation changes
+- `test:` Add or modify tests
+- `refactor:` Code refactoring
+- `style:` Format changes
 
-### Checklist antes de PR
+### Checklist before PR
 
-- [ ] Tests pasan (`python -m pytest`)
-- [ ] Código formateado (`black src/ tests/`)
-- [ ] Linting sin errores (`flake8 src/`)
-- [ ] Documentación actualizada
-- [ ] Changelog actualizado (si aplica)
+- [ ] Tests pass (`python -m pytest`)
+- [ ] Code formatted (`black src/ tests/`)
+- [ ] Linting without errors (`flake8 src/`)
+- [ ] Documentation updated
+- [ ] Changelog updated (if applicable)
 
 ## Debugging
 
 ### Logs
 
-La aplicación utiliza el módulo `logging` de Python:
+The application uses Python's `logging` module:
 
 ```python
 import logging
 
 logger = logging.getLogger(__name__)
-logger.info("Información importante")
-logger.error("Error ocurrido")
+logger.info("Important information")
+logger.error("Error occurred")
 ```
 
-### Configuración de Logs
+### Log Configuration
 
-Los logs se configuran en `main.py` y se guardan en `logs/`.
+Logs are configured in `main.py` and saved in `logs/`.
 
-### Debugging en IDE
+### IDE Debugging
 
-Configuración para VS Code (`.vscode/launch.json`):
+Configuration for VS Code (`.vscode/launch.json`):
 
 ```json
 {
@@ -187,11 +187,11 @@ Configuración para VS Code (`.vscode/launch.json`):
 
 ## Performance
 
-### Optimizaciones Implementadas
+### Implemented Optimizations
 
-- **Cache de imágenes**: Las imágenes se almacenan localmente
-- **Lazy loading**: Los datos se cargan bajo demanda
-- **Indexación**: Búsquedas optimizadas en la base de datos de cartas
+- **Image cache**: Images are stored locally
+- **Lazy loading**: Data is loaded on demand
+- **Indexing**: Optimized searches in the card database
 
 ### Profiling
 
@@ -199,7 +199,7 @@ Configuración para VS Code (`.vscode/launch.json`):
 import cProfile
 
 def profile_function():
-    # Código a perfilar
+    # Code to profile
     pass
 
 cProfile.run('profile_function()')
@@ -207,30 +207,30 @@ cProfile.run('profile_function()')
 
 ## Deployment
 
-### Preparar Release
+### Prepare Release
 
-1. **Actualizar versión** en `setup.py` o `__version__.py`
-2. **Actualizar CHANGELOG.md**
-3. **Ejecutar tests completos**
-4. **Crear tag de versión:**
+1. **Update version** in `setup.py` or `__version__.py`
+2. **Update CHANGELOG.md**
+3. **Run complete tests**
+4. **Create version tag:**
    ```bash
    git tag -a v1.0.0 -m "Release version 1.0.0"
    git push origin v1.0.0
    ```
 
-### Distribución
+### Distribution
 
 ```bash
-# Crear distribución
+# Create distribution
 python setup.py sdist bdist_wheel
 
-# Subir a PyPI (si aplica)
+# Upload to PyPI (if applicable)
 twine upload dist/*
 ```
 
-## Recursos Adicionales
+## Additional Resources
 
-- [Documentación de Magic: The Gathering](https://magic.wizards.com/)
-- [API de Scryfall](https://scryfall.com/docs/api)
+- [Magic: The Gathering Documentation](https://magic.wizards.com/)
+- [Scryfall API](https://scryfall.com/docs/api)
 - [PEP 8 Style Guide](https://www.python.org/dev/peps/pep-0008/)
 - [pytest Documentation](https://docs.pytest.org/)

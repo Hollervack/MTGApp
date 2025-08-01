@@ -1,4 +1,4 @@
-"""Controladores de la aplicación MTG Deck Constructor"""
+"""Controllers for the MTG Deck Constructor application"""
 
 from .app_controller import AppController
 from .deck_controller import DeckController

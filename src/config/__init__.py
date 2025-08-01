@@ -1,4 +1,4 @@
-"""Configuración de la aplicación MTG Deck Constructor"""
+"""Configuration for the MTG Deck Constructor application"""
 
 from .settings import Settings, get_settings
 

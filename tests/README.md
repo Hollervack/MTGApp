@@ -1,157 +1,157 @@
 # Tests - MTG Deck Constructor
 
-Este directorio contiene todos los tests para la aplicación MTG Deck Constructor.
+This directory contains all tests for the MTG Deck Constructor application.
 
-## Estructura de Tests
+## Test Structure
 
 ```
 tests/
-├── __init__.py              # Inicialización del paquete de tests
-├── conftest.py              # Configuración y fixtures compartidas
-├── test_models.py           # Tests para modelos (Card, Deck)
-├── test_services.py         # Tests para servicios
-├── test_controllers.py      # Tests para controladores
-├── test_integration.py      # Tests de integración
-└── README.md               # Este archivo
+├── __init__.py              # Test package initialization
+├── conftest.py              # Configuration and shared fixtures
+├── test_models.py           # Tests for models (Card, Deck)
+├── test_services.py         # Tests for services
+├── test_controllers.py      # Tests for controllers
+├── test_integration.py      # Integration tests
+└── README.md               # This file
 ```
 
-## Tipos de Tests
+## Test Types
 
-### Tests Unitarios
-- **test_models.py**: Tests para las clases `Card` y `Deck`
-- **test_services.py**: Tests para `CardService`, `DeckService`, `ImageService`
-- **test_controllers.py**: Tests para `AppController`, `CardController`, `DeckController`
+### Unit Tests
+- **test_models.py**: Tests for `Card` and `Deck` classes
+- **test_services.py**: Tests for `CardService`, `DeckService`, `ImageService`
+- **test_controllers.py**: Tests for `AppController`, `CardController`, `DeckController`
 
-### Tests de Integración
-- **test_integration.py**: Tests que verifican el funcionamiento conjunto de múltiples componentes
+### Integration Tests
+- **test_integration.py**: Tests that verify the joint operation of multiple components
 
-## Cómo Ejecutar los Tests
+## How to Run Tests
 
-### Opción 1: Script Personalizado (Recomendado)
+### Option 1: Custom Script (Recommended)
 
 ```bash
-# Ejecutar todos los tests
+# Run all tests
 python run_tests.py
 
-# Ejecutar con cobertura
+# Run with coverage
 python run_tests.py --coverage
 
-# Ejecutar solo tests unitarios
+# Run only unit tests
 python run_tests.py --unit
 
-# Ejecutar solo tests de integración
+# Run only integration tests
 python run_tests.py --integration
 
-# Ejecutar módulo específico
+# Run specific module
 python run_tests.py --module test_models
 
-# Salida detallada
+# Verbose output
 python run_tests.py --verbose
 ```
 
-### Opción 2: unittest (Python estándar)
+### Option 2: unittest (Python standard)
 
 ```bash
-# Ejecutar todos los tests
+# Run all tests
 python -m unittest discover tests
 
-# Ejecutar test específico
+# Run specific test
 python -m unittest tests.test_models
 
-# Ejecutar con salida detallada
+# Run with verbose output
 python -m unittest discover tests -v
 ```
 
-### Opción 3: pytest (Recomendado para desarrollo)
+### Option 3: pytest (Recommended for development)
 
 ```bash
-# Instalar dependencias de testing
+# Install testing dependencies
 pip install pytest pytest-cov pytest-mock
 
-# Ejecutar todos los tests
+# Run all tests
 pytest
 
-# Ejecutar con cobertura
+# Run with coverage
 pytest --cov=src
 
-# Ejecutar solo tests unitarios
+# Run only unit tests
 pytest -m unit
 
-# Ejecutar solo tests de integración
+# Run only integration tests
 pytest -m integration
 
-# Ejecutar tests en paralelo
+# Run tests in parallel
 pytest -n auto
 
-# Generar reporte HTML de cobertura
+# Generate HTML coverage report
 pytest --cov=src --cov-report=html
 ```
 
-## Configuración de Tests
+## Test Configuration
 
-### Variables de Entorno
-- `MTG_TEST_MODE=1`: Activa el modo de testing (configurado automáticamente)
+### Environment Variables
+- `MTG_TEST_MODE=1`: Activates testing mode (configured automatically)
 
-### Fixtures Disponibles
+### Available Fixtures
 
-En `conftest.py` se definen fixtures reutilizables:
+Reusable fixtures are defined in `conftest.py`:
 
-- `sample_cards_data`: DataFrame con datos de cartas de ejemplo
-- `sample_cards`: Lista de objetos Card de ejemplo
-- `lightning_bolt`, `counterspell`, `serra_angel`: Cartas específicas
-- `sample_deck`, `empty_deck`: Mazos de ejemplo
-- `temp_directory`: Directorio temporal para tests
-- `temp_cards_file`: Archivo CSV temporal con datos
-- `mock_card_service`, `mock_deck_service`: Mocks de servicios
+- `sample_cards_data`: DataFrame with sample card data
+- `sample_cards`: List of sample Card objects
+- `lightning_bolt`, `counterspell`, `serra_angel`: Specific cards
+- `sample_deck`, `empty_deck`: Sample decks
+- `temp_directory`: Temporary directory for tests
+- `temp_cards_file`: Temporary CSV file with data
+- `mock_card_service`, `mock_deck_service`: Service mocks
 
-### Marcadores de Tests
+### Test Markers
 
-- `@pytest.mark.unit`: Tests unitarios
-- `@pytest.mark.integration`: Tests de integración
-- `@pytest.mark.slow`: Tests que tardan más tiempo
-- `@pytest.mark.network`: Tests que requieren conexión de red
-- `@pytest.mark.gui`: Tests de interfaz gráfica
+- `@pytest.mark.unit`: Unit tests
+- `@pytest.mark.integration`: Integration tests
+- `@pytest.mark.slow`: Tests that take longer
+- `@pytest.mark.network`: Tests that require network connection
+- `@pytest.mark.gui`: Graphical interface tests
 
-## Cobertura de Código
+## Code Coverage
 
-### Generar Reporte de Cobertura
+### Generate Coverage Report
 
 ```bash
-# Con el script personalizado
+# With custom script
 python run_tests.py --coverage
 
-# Con pytest
+# With pytest
 pytest --cov=src --cov-report=html --cov-report=term
 
-# Solo con coverage
+# Only with coverage
 coverage run -m pytest
 coverage report
 coverage html
 ```
 
-### Interpretar Resultados
+### Interpret Results
 
-- **Verde**: Líneas cubiertas por tests
-- **Rojo**: Líneas no cubiertas
-- **Amarillo**: Líneas parcialmente cubiertas
+- **Green**: Lines covered by tests
+- **Red**: Lines not covered
+- **Yellow**: Partially covered lines
 
-Objetivo: Mantener cobertura > 80%
+Goal: Maintain coverage > 80%
 
-## Mejores Prácticas
+## Best Practices
 
-### Escribir Tests
+### Writing Tests
 
 1. **Nombres descriptivos**: `test_add_card_to_deck_success`
-2. **Arrange-Act-Assert**: Organizar, ejecutar, verificar
-3. **Un concepto por test**: Cada test debe verificar una sola cosa
-4. **Tests independientes**: No deben depender del orden de ejecución
-5. **Usar fixtures**: Reutilizar configuración común
+2. **Arrange-Act-Assert**: Organize, execute, verify
+3. **One concept per test**: Each test should verify one thing
+4. **Independent tests**: Should not depend on execution order
+5. **Use fixtures**: Reuse common configuration
 
-### Ejemplo de Test
+### Test Example
 
 ```python
 def test_add_card_to_deck(sample_deck, lightning_bolt):
-    """Test agregar carta al mazo"""
+    """Test adding card to deck"""
     # Arrange
     initial_count = sample_deck.total_cards
     
@@ -165,11 +165,11 @@ def test_add_card_to_deck(sample_deck, lightning_bolt):
 
 ### Mocking
 
-Usar mocks para:
-- Servicios externos (API de Scryfall)
-- Sistema de archivos
-- Bases de datos
-- Interfaces gráficas
+Use mocks for:
+- External services (Scryfall API)
+- File system
+- Databases
+- Graphical interfaces
 
 ```python
 from unittest.mock import Mock, patch
@@ -182,23 +182,23 @@ def test_download_image(mock_get):
 
 ## Debugging Tests
 
-### Tests Fallidos
+### Failed Tests
 
 ```bash
-# Ejecutar solo tests fallidos
+# Run only failed tests
 pytest --lf
 
-# Parar en primer fallo
+# Stop on first failure
 pytest -x
 
-# Mostrar variables locales en fallos
+# Show local variables on failures
 pytest -l
 
-# Entrar en debugger en fallo
+# Enter debugger on failure
 pytest --pdb
 ```
 
-### Logging en Tests
+### Logging in Tests
 
 ```python
 import logging
@@ -210,49 +210,49 @@ def test_with_logging(caplog):
     assert "Expected message" in caplog.text
 ```
 
-## Integración Continua
+## Continuous Integration
 
-Para CI/CD, usar:
+For CI/CD, use:
 
 ```bash
-# Ejecutar tests con salida para CI
+# Run tests with CI output
 pytest --junitxml=test-results.xml --cov=src --cov-report=xml
 ```
 
 ## Troubleshooting
 
-### Problemas Comunes
+### Common Problems
 
-1. **ImportError**: Verificar que `src` esté en el PYTHONPATH
-2. **FileNotFoundError**: Usar fixtures de archivos temporales
-3. **Tests lentos**: Usar mocks en lugar de operaciones reales
-4. **Tests flaky**: Verificar dependencias entre tests
+1. **ImportError**: Verify that `src` is in PYTHONPATH
+2. **FileNotFoundError**: Use temporary file fixtures
+3. **Slow tests**: Use mocks instead of real operations
+4. **Flaky tests**: Check dependencies between tests
 
-### Soluciones
+### Solutions
 
 ```python
-# Agregar src al path
+# Add src to path
 import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-# Usar directorio temporal
+# Use temporary directory
 import tempfile
 with tempfile.TemporaryDirectory() as temp_dir:
     # Test code
 ```
 
-## Contribuir
+## Contributing
 
-Al agregar nuevas funcionalidades:
+When adding new features:
 
-1. Escribir tests antes del código (TDD)
-2. Mantener cobertura alta
-3. Actualizar fixtures si es necesario
-4. Documentar tests complejos
-5. Ejecutar toda la suite antes de commit
+1. Write tests before code (TDD)
+2. Maintain high coverage
+3. Update fixtures if necessary
+4. Document complex tests
+5. Run entire suite before commit
 
 ```bash
-# Verificar antes de commit
+# Verify before commit
 python run_tests.py --coverage
 ```

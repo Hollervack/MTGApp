@@ -1,4 +1,4 @@
-"""Ventana principal de la aplicación MTG Deck Constructor"""
+"""Main window of the MTG Deck Constructor application"""
 
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
@@ -13,32 +13,32 @@ from .collection_view import CollectionView
 
 
 class MainWindow:
-    """Ventana principal de la aplicación"""
+    """Main window of the MTG Deck Constructor application"""
     
     def __init__(self, app_controller: AppController):
         self.app_controller = app_controller
         self.settings = app_controller.get_settings()
         self.logger = logging.getLogger('MTGDeckConstructor.MainWindow')
         
-        # Crear ventana principal
+        # Create main window
         self.root = tk.Tk()
         self.root.title(f"{self.settings.app_name} v{self.settings.app_version}")
         
-        # Configurar ventana
+        # Configure window
         self._setup_window()
         self._create_menu()
         self._create_main_interface()
         self._setup_bindings()
         
-        # Variables de estado
+        # State variables
         self.current_view = None
         self.views = {}
         
-        self.logger.info("Ventana principal inicializada")
+        self.logger.info("Main window initialized")
     
     def _setup_window(self):
-        """Configura la ventana principal"""
-        # Tamaño y posición
+        """Configures the main window"""
+        # Size and position
         width, height = self.settings.window_size
         self.root.geometry(f"{width}x{height}")
         
@@ -47,71 +47,71 @@ class MainWindow:
         else:
             self.root.resizable(False, False)
         
-        # Centrar ventana
+        # Center window
         self.root.update_idletasks()
         x = (self.root.winfo_screenwidth() // 2) - (width // 2)
         y = (self.root.winfo_screenheight() // 2) - (height // 2)
         self.root.geometry(f"{width}x{height}+{x}+{y}")
         
-        # Configurar cierre
+        # Configure close
         self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
         
-        # Configurar estilo
+        # Configure style
         self.style = ttk.Style()
         theme = self.settings.get('ui.theme', 'default')
         if theme in self.style.theme_names():
             self.style.theme_use(theme)
     
     def _create_menu(self):
-        """Crea la barra de menú"""
+        """Creates the menu bar"""
         self.menubar = tk.Menu(self.root)
         self.root.config(menu=self.menubar)
         
-        # Menú Archivo
+        # File Menu
         file_menu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="Archivo", menu=file_menu)
-        file_menu.add_command(label="Nuevo Mazo", command=self._new_deck, accelerator="Ctrl+N")
-        file_menu.add_command(label="Abrir Mazo...", command=self._open_deck, accelerator="Ctrl+O")
-        file_menu.add_command(label="Guardar Mazo", command=self._save_deck, accelerator="Ctrl+S")
-        file_menu.add_command(label="Guardar Como...", command=self._save_deck_as, accelerator="Ctrl+Shift+S")
+        self.menubar.add_cascade(label="File", menu=file_menu)
+        file_menu.add_command(label="New Deck", command=self._new_deck, accelerator="Ctrl+N")
+        file_menu.add_command(label="Open Deck...", command=self._open_deck, accelerator="Ctrl+O")
+        file_menu.add_command(label="Save Deck", command=self._save_deck, accelerator="Ctrl+S")
+        file_menu.add_command(label="Save As...", command=self._save_deck_as, accelerator="Ctrl+Shift+S")
         file_menu.add_separator()
-        file_menu.add_command(label="Importar Mazo...", command=self._import_deck)
-        file_menu.add_command(label="Exportar Mazo...", command=self._export_deck)
+        file_menu.add_command(label="Import Deck...", command=self._import_deck)
+        file_menu.add_command(label="Export Deck...", command=self._export_deck)
         file_menu.add_separator()
-        file_menu.add_command(label="Salir", command=self._on_closing, accelerator="Ctrl+Q")
+        file_menu.add_command(label="Exit", command=self._on_closing, accelerator="Ctrl+Q")
         
-        # Menú Editar
+        # Edit Menu
         edit_menu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="Editar", menu=edit_menu)
-        edit_menu.add_command(label="Buscar Cartas...", command=self._show_card_browser, accelerator="Ctrl+F")
-        edit_menu.add_command(label="Colección", command=self._show_collection, accelerator="Ctrl+L")
+        self.menubar.add_cascade(label="Edit", menu=edit_menu)
+        edit_menu.add_command(label="Search Cards...", command=self._show_card_browser, accelerator="Ctrl+F")
+        edit_menu.add_command(label="Collection", command=self._show_collection, accelerator="Ctrl+L")
         edit_menu.add_separator()
-        edit_menu.add_command(label="Preferencias...", command=self._show_preferences)
+        edit_menu.add_command(label="Preferences...", command=self._show_preferences)
         
-        # Menú Ver
+        # View Menu
         view_menu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="Ver", menu=view_menu)
-        view_menu.add_command(label="Constructor de Mazos", command=self._show_deck_builder)
-        view_menu.add_command(label="Navegador de Cartas", command=self._show_card_browser)
-        view_menu.add_command(label="Colección", command=self._show_collection)
+        self.menubar.add_cascade(label="View", menu=view_menu)
+        view_menu.add_command(label="Deck Builder", command=self._show_deck_builder)
+        view_menu.add_command(label="Card Browser", command=self._show_card_browser)
+        view_menu.add_command(label="Collection", command=self._show_collection)
         view_menu.add_separator()
-        view_menu.add_command(label="Estadísticas", command=self._show_stats)
+        view_menu.add_command(label="Statistics", command=self._show_stats)
         
-        # Menú Herramientas
+        # Tools Menu
         tools_menu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="Herramientas", menu=tools_menu)
-        tools_menu.add_command(label="Analizar Mazo", command=self._analyze_deck)
-        tools_menu.add_command(label="Comparar con Colección", command=self._compare_with_collection)
-        tools_menu.add_command(label="Limpiar Caché de Imágenes", command=self._clear_image_cache)
+        self.menubar.add_cascade(label="Tools", menu=tools_menu)
+        tools_menu.add_command(label="Analyze Deck", command=self._analyze_deck)
+        tools_menu.add_command(label="Compare with Collection", command=self._compare_with_collection)
+        tools_menu.add_command(label="Clear Image Cache", command=self._clear_image_cache)
         
-        # Menú Ayuda
+        # Help Menu
         help_menu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="Ayuda", menu=help_menu)
-        help_menu.add_command(label="Acerca de...", command=self._show_about)
+        self.menubar.add_cascade(label="Help", menu=help_menu)
+        help_menu.add_command(label="About...", command=self._show_about)
     
     def _create_main_interface(self):
-        """Crea la interfaz principal"""
-        # Frame principal
+        """Creates the main interface"""
+        # Main frame
         self.main_frame = ttk.Frame(self.root)
         self.main_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         
@@ -122,58 +122,58 @@ class MainWindow:
         self.content_frame = ttk.Frame(self.main_frame)
         self.content_frame.pack(fill=tk.BOTH, expand=True, pady=(5, 0))
         
-        # Barra de estado
+        # Status bar
         self._create_status_bar()
         
         # Mostrar vista inicial
         self._show_deck_builder()
     
     def _create_toolbar(self):
-        """Crea la barra de herramientas"""
+        """Creates the toolbar"""
         self.toolbar = ttk.Frame(self.main_frame)
         self.toolbar.pack(fill=tk.X, pady=(0, 5))
         
-        # Botones principales
-        ttk.Button(self.toolbar, text="Nuevo Mazo", command=self._new_deck).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(self.toolbar, text="Abrir", command=self._open_deck).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(self.toolbar, text="Guardar", command=self._save_deck).pack(side=tk.LEFT, padx=(0, 5))
+        # Main buttons
+        ttk.Button(self.toolbar, text="New Deck", command=self._new_deck).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(self.toolbar, text="Open", command=self._open_deck).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(self.toolbar, text="Save", command=self._save_deck).pack(side=tk.LEFT, padx=(0, 5))
+        
+        # Separator
+        ttk.Separator(self.toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
+        
+        # Views
+        ttk.Button(self.toolbar, text="Builder", command=self._show_deck_builder).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(self.toolbar, text="Browser", command=self._show_card_browser).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(self.toolbar, text="Collection", command=self._show_collection).pack(side=tk.LEFT, padx=(0, 5))
         
         # Separador
         ttk.Separator(self.toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
         
-        # Botones de vista
-        ttk.Button(self.toolbar, text="Constructor", command=self._show_deck_builder).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(self.toolbar, text="Navegador", command=self._show_card_browser).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(self.toolbar, text="Colección", command=self._show_collection).pack(side=tk.LEFT, padx=(0, 5))
-        
-        # Separador
-        ttk.Separator(self.toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=5)
-        
-        # Botones de análisis
-        ttk.Button(self.toolbar, text="Analizar", command=self._analyze_deck).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(self.toolbar, text="Comparar", command=self._compare_with_collection).pack(side=tk.LEFT, padx=(0, 5))
+        # Tools
+        ttk.Button(self.toolbar, text="Analyze", command=self._analyze_deck).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(self.toolbar, text="Compare", command=self._compare_with_collection).pack(side=tk.LEFT, padx=(0, 5))
     
     def _create_status_bar(self):
-        """Crea la barra de estado"""
+        """Creates the status bar"""
         self.status_frame = ttk.Frame(self.main_frame)
         self.status_frame.pack(fill=tk.X, side=tk.BOTTOM)
         
-        # Etiqueta de estado
+        # Status label
         self.status_var = tk.StringVar()
-        self.status_var.set("Listo")
+        self.status_var.set("Ready")
         self.status_label = ttk.Label(self.status_frame, textvariable=self.status_var)
         self.status_label.pack(side=tk.LEFT, padx=(5, 0))
         
-        # Información adicional
+        # Additional information
         self.info_var = tk.StringVar()
         self.info_label = ttk.Label(self.status_frame, textvariable=self.info_var)
         self.info_label.pack(side=tk.RIGHT, padx=(0, 5))
         
-        # Actualizar información inicial
+        # Update initial information
         self._update_status_info()
     
     def _setup_bindings(self):
-        """Configura los atajos de teclado"""
+        """Configures keyboard shortcuts"""
         self.root.bind('<Control-n>', lambda e: self._new_deck())
         self.root.bind('<Control-o>', lambda e: self._open_deck())
         self.root.bind('<Control-s>', lambda e: self._save_deck())
@@ -184,7 +184,7 @@ class MainWindow:
         self.root.bind('<F5>', lambda e: self._refresh_current_view())
     
     def _show_view(self, view_class, view_name: str):
-        """Muestra una vista específica"""
+        """Shows a specific view"""
         try:
             # Limpiar contenido actual
             for widget in self.content_frame.winfo_children():
@@ -211,181 +211,181 @@ class MainWindow:
                         self.app_controller.get_card_service()
                     )
             
-            # Mostrar vista
+            # Show view
             view = self.views[view_name]
             view.show()
             self.current_view = view_name
             
-            # Actualizar estado
-            self.status_var.set(f"Vista: {view_name.replace('_', ' ').title()}")
+            # Update status
+            self.status_var.set(f"View: {view_name.replace('_', ' ').title()}")
             
         except Exception as e:
-            self.logger.error(f"Error al mostrar vista {view_name}: {e}")
-            messagebox.showerror("Error", f"No se pudo cargar la vista: {e}")
+            self.logger.error(f"Error showing view {view_name}: {e}")
+            messagebox.showerror("Error", f"Could not load view: {e}")
     
     def _show_deck_builder(self):
-        """Muestra el constructor de mazos"""
+        """Shows the deck builder"""
         self._show_view(DeckBuilderView, 'deck_builder')
     
     def _show_card_browser(self):
-        """Muestra el navegador de cartas"""
+        """Shows the card browser"""
         self._show_view(CardBrowserView, 'card_browser')
     
     def _show_collection(self):
-        """Muestra la vista de colección"""
+        """Shows the collection"""
         self._show_view(CollectionView, 'collection')
     
     def _new_deck(self):
-        """Crea un nuevo mazo"""
+        """Creates a new deck"""
         try:
-            # Mostrar constructor de mazos
+            # Show deck builder
             self._show_deck_builder()
             
-            # Crear nuevo mazo en el constructor
+            # Create new deck in builder
             if 'deck_builder' in self.views:
                 self.views['deck_builder'].new_deck()
             
-            self.status_var.set("Nuevo mazo creado")
+            self.status_var.set("New deck created")
         except Exception as e:
-            self.logger.error(f"Error al crear nuevo mazo: {e}")
-            messagebox.showerror("Error", f"No se pudo crear el mazo: {e}")
+            self.logger.error(f"Error creating new deck: {e}")
+            messagebox.showerror("Error", f"Could not create deck: {e}")
     
     def _open_deck(self):
-        """Abre un mazo existente"""
+        """Opens an existing deck"""
         try:
             # Mostrar diálogo de selección
             decks_dir = Path(self.settings.decks_directory)
             file_path = filedialog.askopenfilename(
-                title="Abrir Mazo",
+                title="Open Deck",
                 initialdir=decks_dir,
-                filetypes=[("Archivos JSON", "*.json"), ("Todos los archivos", "*.*")]
+                filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
             )
             
             if file_path:
-                # Mostrar constructor de mazos
+                # Show deck builder
                 self._show_deck_builder()
                 
-                # Cargar mazo en el constructor
+                # Load deck in builder
                 if 'deck_builder' in self.views:
                     filename = Path(file_path).name
                     success = self.views['deck_builder'].load_deck(filename)
                     
                     if success:
-                        self.status_var.set(f"Mazo cargado: {filename}")
+                        self.status_var.set(f"Deck loaded: {filename}")
                     else:
-                        messagebox.showerror("Error", "No se pudo cargar el mazo")
+                        messagebox.showerror("Error", "Could not load deck")
         except Exception as e:
-            self.logger.error(f"Error al abrir mazo: {e}")
-            messagebox.showerror("Error", f"No se pudo abrir el mazo: {e}")
+            self.logger.error(f"Error loading deck: {e}")
+            messagebox.showerror("Error", f"Could not load deck: {e}")
     
     def _save_deck(self):
-        """Guarda el mazo actual"""
+        """Saves the current deck"""
         try:
             if 'deck_builder' in self.views:
                 success = self.views['deck_builder'].save_deck()
                 if success:
-                    self.status_var.set("Mazo guardado")
+                    self.status_var.set("Deck saved")
                 else:
-                    messagebox.showwarning("Advertencia", "No se pudo guardar el mazo")
+                    messagebox.showwarning("Warning", "Could not save the deck")
             else:
-                messagebox.showinfo("Información", "No hay mazo para guardar")
+                messagebox.showinfo("Information", "No deck to save")
         except Exception as e:
-            self.logger.error(f"Error al guardar mazo: {e}")
-            messagebox.showerror("Error", f"No se pudo guardar el mazo: {e}")
+            self.logger.error(f"Error saving deck: {e}")
+            messagebox.showerror("Error", f"Could not save deck: {e}")
     
     def _save_deck_as(self):
-        """Guarda el mazo con un nuevo nombre"""
+        """Save the deck with a new name"""
         try:
             if 'deck_builder' in self.views:
                 success = self.views['deck_builder'].save_deck_as()
                 if success:
-                    self.status_var.set("Mazo guardado con nuevo nombre")
+                    self.status_var.set("Deck saved with new name")
             else:
-                messagebox.showinfo("Información", "No hay mazo para guardar")
+                messagebox.showinfo("Information", "No deck to save")
         except Exception as e:
-            self.logger.error(f"Error al guardar mazo como: {e}")
-            messagebox.showerror("Error", f"No se pudo guardar el mazo: {e}")
+            self.logger.error(f"Error saving deck as: {e}")
+            messagebox.showerror("Error", f"Could not save deck: {e}")
     
     def _import_deck(self):
-        """Importa un mazo desde archivo"""
+        """Import a deck from file"""
         try:
             file_path = filedialog.askopenfilename(
-                title="Importar Mazo",
-                filetypes=[("Archivos de texto", "*.txt"), ("Todos los archivos", "*.*")]
+                title="Import Deck",
+                filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
             )
             
             if file_path:
-                # Mostrar constructor de mazos
+                # Show deck builder
                 self._show_deck_builder()
                 
-                # Importar en el constructor
+                # Import in builder
                 if 'deck_builder' in self.views:
                     success = self.views['deck_builder'].import_deck(file_path)
                     if success:
-                        self.status_var.set(f"Mazo importado: {Path(file_path).name}")
+                        self.status_var.set(f"Deck imported: {Path(file_path).name}")
         except Exception as e:
-            self.logger.error(f"Error al importar mazo: {e}")
-            messagebox.showerror("Error", f"No se pudo importar el mazo: {e}")
+            self.logger.error(f"Error importing deck: {e}")
+            messagebox.showerror("Error", f"Could not import deck: {e}")
     
     def _export_deck(self):
-        """Exporta el mazo actual"""
+        """Export the current deck"""
         try:
             if 'deck_builder' in self.views:
                 success = self.views['deck_builder'].export_deck()
                 if success:
-                    self.status_var.set("Mazo exportado")
+                    self.status_var.set("Deck exported")
             else:
-                messagebox.showinfo("Información", "No hay mazo para exportar")
+                messagebox.showinfo("Information", "No deck to export")
         except Exception as e:
-            self.logger.error(f"Error al exportar mazo: {e}")
-            messagebox.showerror("Error", f"No se pudo exportar el mazo: {e}")
+            self.logger.error(f"Error exporting deck: {e}")
+            messagebox.showerror("Error", f"Could not export deck: {e}")
     
     def _analyze_deck(self):
-        """Analiza el mazo actual"""
+        """Analyzes the current deck"""
         try:
             if 'deck_builder' in self.views:
                 self.views['deck_builder'].analyze_deck()
             else:
-                messagebox.showinfo("Información", "No hay mazo para analizar")
+                messagebox.showinfo("Information", "No deck to analyze")
         except Exception as e:
-            self.logger.error(f"Error al analizar mazo: {e}")
-            messagebox.showerror("Error", f"No se pudo analizar el mazo: {e}")
+            self.logger.error(f"Error analyzing deck: {e}")
+            messagebox.showerror("Error", f"Could not analyze deck: {e}")
     
     def _compare_with_collection(self):
-        """Compara el mazo con la colección"""
+        """Compares the deck with the collection"""
         try:
             if 'deck_builder' in self.views:
                 self.views['deck_builder'].compare_with_collection()
             else:
-                messagebox.showinfo("Información", "No hay mazo para comparar")
+                messagebox.showinfo("Information", "No deck to compare")
         except Exception as e:
-            self.logger.error(f"Error al comparar mazo: {e}")
-            messagebox.showerror("Error", f"No se pudo comparar el mazo: {e}")
+            self.logger.error(f"Error comparing deck: {e}")
+            messagebox.showerror("Error", f"Could not compare deck: {e}")
     
     def _clear_image_cache(self):
-        """Limpia la caché de imágenes"""
+        """Clears the image cache"""
         try:
             result = messagebox.askyesno(
-                "Confirmar", 
-                "¿Está seguro de que desea limpiar la caché de imágenes?"
+                "Confirm", 
+                "Are you sure you want to clear the image cache?"
             )
             
             if result:
                 self.app_controller.get_image_service().clear_cache()
-                self.status_var.set("Caché de imágenes limpiada")
-                messagebox.showinfo("Información", "Caché de imágenes limpiada correctamente")
+                self.status_var.set("Image cache cleared")
+                messagebox.showinfo("Information", "Image cache cleared successfully")
         except Exception as e:
-            self.logger.error(f"Error al limpiar caché: {e}")
-            messagebox.showerror("Error", f"No se pudo limpiar la caché: {e}")
+            self.logger.error(f"Error clearing cache: {e}")
+            messagebox.showerror("Error", f"Could not clear cache: {e}")
     
     def _show_stats(self):
-        """Muestra estadísticas de la aplicación"""
+        """Shows application statistics"""
         try:
             stats = self.app_controller.get_application_stats()
             
-            # Crear ventana de estadísticas
+            # Create statistics window
             stats_window = tk.Toplevel(self.root)
-            stats_window.title("Estadísticas")
+            stats_window.title("Statistics")
             stats_window.geometry("400x300")
             stats_window.transient(self.root)
             stats_window.grab_set()
@@ -395,107 +395,107 @@ class MainWindow:
             text_widget.pack(fill=tk.BOTH, expand=True)
             
             # Formatear estadísticas
-            content = f"""ESTADÍSTICAS DE LA APLICACIÓN
+            content = f"""APPLICATION STATISTICS
 
-Información de la Aplicación:
-- Nombre: {stats.get('app_info', {}).get('name', 'N/A')}
-- Versión: {stats.get('app_info', {}).get('version', 'N/A')}
+Application Information:
+- Name: {stats.get('app_info', {}).get('name', 'N/A')}
+- Version: {stats.get('app_info', {}).get('version', 'N/A')}
 
-Colección:
-- Total de cartas: {stats.get('collection_stats', {}).get('total_cards', 0)}
-- Cartas únicas: {stats.get('collection_stats', {}).get('unique_cards', 0)}
+Collection:
+- Total cards: {stats.get('collection_stats', {}).get('total_cards', 0)}
+- Unique cards: {stats.get('collection_stats', {}).get('unique_cards', 0)}
 
-Mazos:
-- Total de mazos: {stats.get('deck_stats', {}).get('total_decks', 0)}
+Decks:
+- Total decks: {stats.get('deck_stats', {}).get('total_decks', 0)}
 
-Caché de Imágenes:
-- Imágenes en caché: {stats.get('cache_stats', {}).get('cached_images', 0)}
-- Tamaño de caché: {stats.get('cache_stats', {}).get('cache_size_mb', 0):.1f} MB"""
+Image Cache:
+- Cached images: {stats.get('cache_stats', {}).get('cached_images', 0)}
+- Cache size: {stats.get('cache_stats', {}).get('cache_size_mb', 0):.1f} MB"""
             
             text_widget.insert(tk.END, content)
             text_widget.config(state=tk.DISABLED)
             
         except Exception as e:
-            self.logger.error(f"Error al mostrar estadísticas: {e}")
-            messagebox.showerror("Error", f"No se pudieron cargar las estadísticas: {e}")
+            self.logger.error(f"Error showing statistics: {e}")
+            messagebox.showerror("Error", f"Could not load statistics: {e}")
     
     def _show_preferences(self):
-        """Muestra la ventana de preferencias"""
-        messagebox.showinfo("Información", "Ventana de preferencias no implementada aún")
+        """Shows the preferences window"""
+        messagebox.showinfo("Information", "Preferences window not implemented yet")
     
     def _show_about(self):
-        """Muestra información sobre la aplicación"""
+        """Shows information about the application"""
         about_text = f"""{self.settings.app_name}
-Versión {self.settings.app_version}
+Version {self.settings.app_version}
 
-Aplicación para construcción y gestión de mazos de Magic: The Gathering.
+Application for building and managing Magic: The Gathering decks.
 
-Desarrollado con Python y Tkinter."""
+Developed with Python and Tkinter."""
         
-        messagebox.showinfo("Acerca de", about_text)
+        messagebox.showinfo("About", about_text)
     
     def _refresh_current_view(self):
-        """Actualiza la vista actual"""
+        """Refreshes the current view"""
         try:
             if self.current_view and self.current_view in self.views:
                 view = self.views[self.current_view]
                 if hasattr(view, 'refresh'):
                     view.refresh()
-                self.status_var.set("Vista actualizada")
+                self.status_var.set("View refreshed")
         except Exception as e:
-            self.logger.error(f"Error al actualizar vista: {e}")
+            self.logger.error(f"Error refreshing view: {e}")
     
     def _update_status_info(self):
-        """Actualiza la información de la barra de estado"""
+        """Updates the status bar information"""
         try:
             stats = self.app_controller.get_application_stats()
             collection_stats = stats.get('collection_stats', {})
             total_cards = collection_stats.get('total_cards', 0)
             unique_cards = collection_stats.get('unique_cards', 0)
             
-            self.info_var.set(f"Colección: {total_cards} cartas ({unique_cards} únicas)")
+            self.info_var.set(f"Collection: {total_cards} cards ({unique_cards} unique)")
             
             # Programar próxima actualización
             self.root.after(30000, self._update_status_info)  # Cada 30 segundos
         except Exception as e:
-            self.logger.error(f"Error al actualizar información de estado: {e}")
+            self.logger.error(f"Error updating status information: {e}")
     
     def _on_closing(self):
-        """Maneja el cierre de la aplicación"""
+        """Handles application closing"""
         try:
-            # Preguntar si hay cambios sin guardar
+            # Ask if there are unsaved changes
             if 'deck_builder' in self.views:
                 if hasattr(self.views['deck_builder'], 'has_unsaved_changes'):
                     if self.views['deck_builder'].has_unsaved_changes():
                         result = messagebox.askyesnocancel(
-                            "Guardar cambios",
-                            "Hay cambios sin guardar. ¿Desea guardarlos antes de salir?"
+                            "Save changes",
+                            "There are unsaved changes. Do you want to save them before exiting?"
                         )
                         
-                        if result is True:  # Sí, guardar
+                        if result is True:  # Yes, save
                             if not self.views['deck_builder'].save_deck():
-                                return  # No cerrar si no se pudo guardar
-                        elif result is None:  # Cancelar
-                            return  # No cerrar
+                                return  # Don't close if couldn't save
+                        elif result is None:  # Cancel
+                            return  # Don't close
             
-            # Guardar configuraciones de ventana
+            # Save window configurations
             if self.settings.get('ui.remember_window_size', True):
                 self.settings.set('ui.window_width', self.root.winfo_width())
                 self.settings.set('ui.window_height', self.root.winfo_height())
             
-            # Cerrar aplicación
+            # Close application
             self.app_controller.shutdown()
             self.root.destroy()
             
         except Exception as e:
-            self.logger.error(f"Error al cerrar aplicación: {e}")
-            self.root.destroy()  # Forzar cierre
+            self.logger.error(f"Error closing application: {e}")
+            self.root.destroy()  # Force close
     
     def run(self):
-        """Ejecuta la aplicación"""
+        """Runs the application"""
         try:
-            self.logger.info("Iniciando interfaz gráfica")
+            self.logger.info("Starting graphical interface")
             self.root.mainloop()
         except Exception as e:
-            self.logger.error(f"Error en la interfaz gráfica: {e}")
+            self.logger.error(f"Error in graphical interface: {e}")
             raise

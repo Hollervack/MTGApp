@@ -7,7 +7,7 @@ import json
 from unittest.mock import patch, Mock
 import pandas as pd
 
-# Agregar el directorio src al path
+# Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 try:
@@ -21,7 +21,7 @@ try:
     from models.card import Card
     from models.deck import Deck
 except ImportError:
-    # Fallback para imports absolutos
+    # Fallback for absolute imports
     import sys
     import os
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -37,16 +37,16 @@ except ImportError:
 
 
 class TestIntegration(unittest.TestCase):
-    """Tests de integración para el sistema completo"""
+    """Integration tests for the complete system"""
     
     def setUp(self):
-        """Configuración inicial para tests de integración"""
-        # Crear directorio temporal para tests
+        """Initial setup for integration tests"""
+        # Create temporary directory for tests
         self.test_dir = tempfile.mkdtemp()
         self.cards_file = os.path.join(self.test_dir, 'test_cards.csv')
         self.decks_dir = os.path.join(self.test_dir, 'decks')
         
-        # Crear datos de prueba
+        # Create test data
         self.test_data = pd.DataFrame([
             {
                 'card_name': 'Lightning Bolt',
@@ -98,70 +98,70 @@ class TestIntegration(unittest.TestCase):
         # Guardar datos de prueba
         self.test_data.to_csv(self.cards_file, index=False)
         
-        # Crear directorio de mazos
+        # Create decks directory
         os.makedirs(self.decks_dir, exist_ok=True)
     
     def tearDown(self):
-        """Limpieza después de cada test"""
+        """Cleanup after each test"""
         shutil.rmtree(self.test_dir)
     
     def test_card_service_integration(self):
-        """Test integración del servicio de cartas"""
+        """Test card service integration"""
         card_service = CardService(self.cards_file)
         
-        # Verificar carga de cartas
+        # Verify card loading
         self.assertEqual(len(card_service.cards), 3)
         
-        # Test búsqueda por nombre
+        # Test search by name
         results = card_service.search_cards(card_name='Lightning')
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].card_name, 'Lightning Bolt')
         
-        # Test búsqueda por color
+        # Test search by color
         red_cards = card_service.search_cards(colors=['R'])
         self.assertEqual(len(red_cards), 1)
         
-        # Test búsqueda por tipo
+        # Test search by type
         instants = card_service.search_cards(type_line='Instant')
         self.assertEqual(len(instants), 2)
         
-        # Test búsqueda por tipo de carta
+        # Test search by card type
         creatures = card_service.search_cards(type_line='Creature')
         self.assertEqual(len(creatures), 1)
     
     def test_deck_service_integration(self):
-        """Test integración del servicio de mazos"""
-        # Crear servicios
+        """Test deck service integration"""
+        # Create services
         card_service = CardService(self.cards_file)
         deck_service = DeckService(card_service, self.decks_dir)
         
-        # Test crear mazo
+        # Test create deck
         deck = deck_service.create_deck('Integration Test Deck')
         self.assertEqual(deck.name, 'Integration Test Deck')
         
-        # Test agregar cartas
+        # Test add cards
         lightning_bolt = card_service.find_card_by_name('Lightning Bolt')
         self.assertIsNotNone(lightning_bolt)
         
         deck.add_card(lightning_bolt, 4)
         self.assertEqual(deck.total_cards, 4)
         
-        # Test guardar mazo
+        # Test save deck
         save_result = deck_service.save_deck(deck)
         self.assertTrue(save_result)
         
-        # Verificar que el archivo existe
+        # Verify that file exists
         expected_filename = deck_service._safe_filename(deck.name) + '.json'
         deck_file = os.path.join(self.decks_dir, expected_filename)
         self.assertTrue(os.path.exists(deck_file))
         
-        # Test cargar mazo
+        # Test load deck
         loaded_deck = deck_service.load_deck(expected_filename)
         self.assertIsNotNone(loaded_deck)
         self.assertEqual(loaded_deck.name, 'Integration Test Deck')
         self.assertEqual(loaded_deck.total_cards, 4)
         
-        # Test listar mazos
+        # Test list decks
         decks = deck_service.list_decks()
         self.assertIsInstance(decks, list)
         self.assertTrue(len(decks) > 0)
@@ -170,34 +170,34 @@ class TestIntegration(unittest.TestCase):
         self.assertIn('Integration Test Deck', deck_names)
     
     def test_card_controller_integration(self):
-        """Test integración del controlador de cartas"""
+        """Test card controller integration"""
         card_service = CardService(self.cards_file)
         card_controller = CardController(card_service)
         
-        # Test búsqueda de cartas
+        # Test card search
         results = card_controller.search_cards(card_name='Lightning')
         self.assertEqual(len(results), 1)
         
-        # Test obtener detalles de carta
+        # Test get card details
         card = card_controller.get_card_details('Lightning Bolt')
         self.assertIsNotNone(card)
         self.assertEqual(card.card_name, 'Lightning Bolt')
         
-        # Test cartas aleatorias
+        # Test random cards
         random_cards = card_controller.get_random_cards(2)
         self.assertEqual(len(random_cards), 2)
         
-        # Test sugerencias
+        # Test suggestions
         suggestions = card_controller.get_card_suggestions('Light')
         self.assertGreater(len(suggestions), 0)
     
     def test_deck_controller_integration(self):
-        """Test integración del controlador de mazos"""
-        # Crear servicios
+        """Test deck controller integration"""
+        # Create services
         card_service = CardService(self.cards_file)
         deck_service = DeckService(card_service, self.decks_dir)
         
-        # Crear controlador
+        # Create controller
         deck_controller = DeckController(deck_service, card_service)
         
         # Test crear mazo
@@ -225,7 +225,7 @@ class TestIntegration(unittest.TestCase):
     
     @patch('src.config.settings.Settings')
     def test_app_controller_integration(self, mock_settings_class):
-        """Test integración del controlador principal"""
+        """Test main controller integration"""
         # Mock settings
         mock_settings = Mock()
         mock_settings.cards_file = self.cards_file
@@ -303,7 +303,7 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual(deck_controller.get_current_deck().total_cards, 10)
     
     def test_error_handling(self):
-        """Test manejo de errores en integración"""
+        """Test error handling in integration"""
         # Test archivo de cartas inexistente
         with self.assertRaises(FileNotFoundError):
             CardService('nonexistent_file.csv')

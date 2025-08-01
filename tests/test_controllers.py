@@ -3,7 +3,7 @@ import sys
 import os
 from unittest.mock import Mock, patch, MagicMock
 
-# Agregar el directorio src al path
+# Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 try:
@@ -16,7 +16,7 @@ try:
     from models.card import Card
     from models.deck import Deck
 except ImportError:
-    # Fallback para imports absolutos
+    # Fallback for absolute imports
     import sys
     import os
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -31,16 +31,16 @@ except ImportError:
 
 
 class TestAppController(unittest.TestCase):
-    """Tests para AppController"""
+    """Tests for AppController"""
     
     def setUp(self):
-        """Configuración inicial para cada test"""
-        # Mock de servicios
+        """Initial setup for each test"""
+        # Mock services
         self.mock_card_service = Mock()
         self.mock_deck_service = Mock()
         self.mock_image_service = Mock()
         
-        # Mock de configuración
+        # Mock configuration
         self.mock_settings = Mock()
         self.mock_settings.cards_file = 'test_cards.csv'
         
@@ -51,7 +51,7 @@ class TestAppController(unittest.TestCase):
                         self.app_controller = AppController()
     
     def test_initialization(self):
-        """Test inicialización del controlador"""
+        """Test controller initialization"""
         self.assertIsNotNone(self.app_controller.card_service)
         self.assertIsNotNone(self.app_controller.deck_service)
         self.assertIsNotNone(self.app_controller.image_service)
@@ -68,27 +68,27 @@ class TestAppController(unittest.TestCase):
         self.assertEqual(service, self.mock_deck_service)
     
     def test_get_image_service(self):
-        """Test obtener servicio de imágenes"""
+        """Test get image service"""
         service = self.app_controller.get_image_service()
         self.assertEqual(service, self.mock_image_service)
     
     def test_get_settings(self):
-        """Test obtener configuración"""
+        """Test get configuration"""
         settings = self.app_controller.get_settings()
         self.assertEqual(settings, self.mock_settings)
 
 
 class TestCardController(unittest.TestCase):
-    """Tests para CardController"""
+    """Tests for CardController"""
     
     def setUp(self):
-        """Configuración inicial para cada test"""
+        """Initial setup for each test"""
         self.mock_card_service = Mock()
         self.mock_scryfall_service = Mock()
         self.mock_image_service = Mock()
         self.card_controller = CardController(self.mock_card_service, self.mock_scryfall_service, self.mock_image_service)
         
-        # Crear cartas de prueba
+        # Create test cards
         self.test_cards = [
             Card(
                 card_name='Lightning Bolt',
@@ -105,7 +105,7 @@ class TestCardController(unittest.TestCase):
         ]
     
     def test_search_cards(self):
-        """Test búsqueda básica de cartas"""
+        """Test basic card search"""
         self.mock_card_service.search_cards.return_value = self.test_cards
         
         results = self.card_controller.search_cards('Lightning')
@@ -114,8 +114,8 @@ class TestCardController(unittest.TestCase):
         self.mock_card_service.search_cards.assert_called_once_with('Lightning', 50)
     
     def test_search_cards_with_filters(self):
-        """Test búsqueda con filtros avanzados"""
-        filtered_cards = [self.test_cards[0]]  # Solo Lightning Bolt
+        """Test search with advanced filters"""
+        filtered_cards = [self.test_cards[0]]  # Only Lightning Bolt
         
         filters = {
             'colors': ['R'],
@@ -168,15 +168,15 @@ class TestCardController(unittest.TestCase):
 
 
 class TestDeckController(unittest.TestCase):
-    """Tests para DeckController"""
+    """Tests for DeckController"""
     
     def setUp(self):
-        """Configuración inicial para cada test"""
+        """Initial setup for each test"""
         self.mock_deck_service = Mock()
         self.mock_card_service = Mock()
         self.deck_controller = DeckController(self.mock_deck_service, self.mock_card_service)
         
-        # Crear mazo de prueba
+        # Create test deck
         self.test_deck = Deck(name="Test Deck")
         self.test_card = Card(
             card_name='Lightning Bolt',
@@ -186,8 +186,8 @@ class TestDeckController(unittest.TestCase):
         )
     
     def test_create_new_deck(self):
-        """Test crear nuevo mazo"""
-        # Mock del servicio
+        """Test create new deck"""
+        # Mock service
         mock_deck = Mock()
         mock_deck.name = 'New Deck'
         self.mock_deck_service.create_deck.return_value = mock_deck
@@ -199,12 +199,12 @@ class TestDeckController(unittest.TestCase):
         self.mock_deck_service.create_deck.assert_called_once()
     
     def test_add_card_to_deck(self):
-        """Test agregar carta al mazo"""
-        # Mock del mazo actual
+        """Test add card to deck"""
+        # Mock current deck
         mock_deck = Mock()
         self.deck_controller.current_deck = mock_deck
         
-        # Mock de la carta
+        # Mock card
         mock_card = Mock()
         mock_card.card_name = 'Lightning Bolt'
         self.mock_card_service.find_card_by_name.return_value = mock_card
@@ -214,8 +214,8 @@ class TestDeckController(unittest.TestCase):
         self.assertTrue(result)
     
     def test_add_card_to_deck_limit(self):
-        """Test límite de cartas en mazo"""
-        # Mock del mazo actual
+        """Test card limit in deck"""
+        # Mock current deck
         mock_deck = Mock()
         self.deck_controller.current_deck = mock_deck
         
@@ -277,7 +277,7 @@ class TestDeckController(unittest.TestCase):
         self.mock_deck_service.load_deck.assert_called_once_with('test_deck.json')
     
     def test_get_deck_analysis(self):
-        """Test obtener análisis del mazo"""
+        """Test get deck analysis"""
         # Mock del mazo actual
         mock_deck = Mock()
         self.deck_controller.current_deck = mock_deck

@@ -1,75 +1,124 @@
-# Instalación y Configuración
+# Installation and Configuration
 
-## Requisitos del Sistema
+## System Requirements
 
-- Python 3.8 o superior
-- pip (gestor de paquetes de Python)
-- Git (para clonar el repositorio)
+- Python 3.8 or higher
+- pip (Python package manager)
+- Git (to clone the repository)
 
-## Instalación
+## Installation
 
-### 1. Clonar el Repositorio
+### 1. Clone the Repository
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone <REPOSITORY_URL>
 cd MTGDeckConstructorApp
 ```
 
-### 2. Crear Entorno Virtual (Recomendado)
+### 2. Create Virtual Environment (Recommended)
 
 ```bash
 python -m venv venv
 
-# En macOS/Linux:
+# On macOS/Linux:
 source venv/bin/activate
 
-# En Windows:
+# On Windows:
 venv\Scripts\activate
 ```
 
-### 3. Instalar Dependencias
+### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configuración Inicial
+### 4. Configure the Application
 
-El archivo `config.json` contiene la configuración de la aplicación. Los valores por defecto deberían funcionar para la mayoría de casos de uso.
+1. Copy the example configuration file:
+   ```bash
+   cp config.json.example config.json
+   ```
 
-### 5. Ejecutar la Aplicación
+2. Edit `config.json` according to your needs:
+   ```json
+   {
+     "data_path": "data/",
+     "cache_path": "cache/",
+     "log_level": "INFO",
+     "scryfall_api_delay": 0.1
+   }
+   ```
+
+### 5. Run the Application
 
 ```bash
 python main.py
 ```
 
-## Estructura de Directorios
+## Advanced Configuration
 
+### Path Configuration
+
+- `data_path`: Directory where card data is stored
+- `cache_path`: Directory for image cache
+- `log_level`: Logging level (DEBUG, INFO, WARNING, ERROR)
+- `scryfall_api_delay`: Delay between API calls (in seconds)
+
+### Cache Configuration
+
+The application uses a cache system for card images:
+
+- Images are automatically downloaded the first time
+- They are stored locally for quick access
+- The cache can be cleared by deleting the `cache/` folder
+
+## Troubleshooting
+
+### Error: "No module named 'tkinter'"
+
+**On Ubuntu/Debian:**
+```bash
+sudo apt-get install python3-tk
 ```
-MTGDeckConstructorApp/
-├── src/                 # Código fuente principal
-│   ├── controllers/     # Controladores de la aplicación
-│   ├── models/         # Modelos de datos
-│   ├── services/       # Servicios y lógica de negocio
-│   └── views/          # Interfaz de usuario
-├── tests/              # Tests unitarios e integración
-├── data/               # Datos de cartas y mazos
-├── docs/               # Documentación
-├── cache/              # Cache de imágenes (generado automáticamente)
-├── logs/               # Archivos de log (generado automáticamente)
-└── main.py             # Punto de entrada de la aplicación
+
+**On CentOS/RHEL:**
+```bash
+sudo yum install tkinter
+# or on newer versions:
+sudo dnf install python3-tkinter
 ```
 
-## Configuración Avanzada
+### Internet Connection Error
 
-### Base de Datos de Cartas
+The application requires internet connection to:
+- Download card data from Scryfall
+- Download card images
 
-La aplicación utiliza un archivo CSV (`data/databaseMTG.csv`) como base de datos de cartas. Este archivo debe contener información sobre las cartas de Magic: The Gathering.
+Make sure you have a stable internet connection.
 
-### Cache de Imágenes
+### Performance Issues
 
-Las imágenes de cartas se almacenan en cache en el directorio `cache/images/` para mejorar el rendimiento.
+If the application is slow:
+1. Verify you have enough available RAM
+2. Consider increasing the `scryfall_api_delay` in the configuration
+3. Clear the image cache if it's too full
 
-### Logs
+## Uninstallation
 
-Los archivos de log se generan automáticamente en el directorio `logs/` para ayudar en la depuración y monitoreo.
+To completely uninstall the application:
+
+1. Deactivate the virtual environment:
+   ```bash
+   deactivate
+   ```
+
+2. Delete the project directory:
+   ```bash
+   rm -rf MTGDeckConstructorApp
+   ```
+
+3. Optionally, delete the virtual environment:
+   ```bash
+   rm -rf venv
+   ```

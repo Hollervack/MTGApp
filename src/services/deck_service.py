@@ -1,4 +1,4 @@
-"""Servicio para gestión de mazos MTG"""
+"""Service for MTG deck management"""
 
 import csv
 import json
@@ -11,7 +11,7 @@ from .card_service import CardService
 
 
 class DeckService:
-    """Servicio para operaciones con mazos MTG"""
+    """Service for MTG deck operations"""
     
     def __init__(self, card_service: CardService, decks_dir: str = 'data/decks'):
         self.card_service = card_service
@@ -19,27 +19,27 @@ class DeckService:
         self.decks_dir.mkdir(parents=True, exist_ok=True)
     
     def create_deck(self, name: str, format: Optional[str] = None, description: Optional[str] = None) -> Deck:
-        """Crea un nuevo mazo"""
+        """Creates a new deck"""
         return Deck(name=name, format=format, description=description)
     
     def save_deck(self, deck: Deck) -> bool:
-        """Guarda un mazo en disco"""
+        """Saves a deck to disk"""
         try:
-            # Crear nombre de archivo seguro
+            # Create safe filename
             filename = self._safe_filename(deck.name) + '.json'
             file_path = self.decks_dir / filename
             
-            # Convertir a diccionario y guardar como JSON
+            # Convert to dictionary and save as JSON
             with open(file_path, 'w', encoding='utf-8') as f:
                 json.dump(deck.to_dict(), f, ensure_ascii=False, indent=2)
             
             return True
         except Exception as e:
-            print(f"Error al guardar mazo: {e}")
+            print(f"Error saving deck: {e}")
             return False
     
     def load_deck(self, filename: str) -> Optional[Deck]:
-        """Carga un mazo desde disco"""
+        """Loads a deck from disk"""
         try:
             file_path = self.decks_dir / filename
             
@@ -51,11 +51,11 @@ class DeckService:
             
             return Deck.from_dict(deck_data)
         except Exception as e:
-            print(f"Error al cargar mazo: {e}")
+            print(f"Error loading deck: {e}")
             return None
     
     def list_decks(self) -> List[Dict[str, Any]]:
-        """Lista todos los mazos disponibles"""
+        """Lists all available decks"""
         decks = []
         
         try:
@@ -65,21 +65,21 @@ class DeckService:
                         deck_data = json.load(f)
                     
                     decks.append({
-                        'name': deck_data.get('name', 'Sin nombre'),
+                        'name': deck_data.get('name', 'Unnamed'),
                         'format': deck_data.get('format'),
                         'card_count': len(deck_data.get('cards', [])),
                         'filename': file_path.name
                     })
                 except Exception as e:
-                    print(f"Error al leer mazo {file_path.name}: {e}")
+                    print(f"Error reading deck {file_path.name}: {e}")
                     continue
         except Exception as e:
-            print(f"Error al listar mazos: {e}")
+            print(f"Error listing decks: {e}")
         
         return decks
     
     def delete_deck(self, filename: str) -> bool:
-        """Elimina un mazo del disco"""
+        """Deletes a deck from disk"""
         try:
             file_path = self.decks_dir / filename
             
@@ -89,11 +89,11 @@ class DeckService:
             
             return False
         except Exception as e:
-            print(f"Error al eliminar mazo: {e}")
+            print(f"Error deleting deck: {e}")
             return False
     
     def import_deck_from_txt(self, file_path: str, deck_name: str) -> Optional[Deck]:
-        """Importa un mazo desde un archivo de texto (formato común)"""
+        """Imports a deck from a text file (common format)"""
         try:
             deck = self.create_deck(deck_name)
             path = Path(file_path)
@@ -106,7 +106,7 @@ class DeckService:
                 if not line or line.startswith('//'):
                     continue
                 
-                # Formato típico: "2x Card Name" o "2 Card Name"
+                # Typical format: "2x Card Name" or "2 Card Name"
                 parts = line.split(' ', 1)
                 if len(parts) < 2:
                     continue
@@ -119,7 +119,7 @@ class DeckService:
                 except ValueError:
                     continue
                 
-                # Buscar la carta en la colección
+                # Search for the card in the collection
                 card = self.card_service.find_card_by_name(card_name)
                 
                 if card:
@@ -127,11 +127,11 @@ class DeckService:
             
             return deck
         except Exception as e:
-            print(f"Error al importar mazo desde TXT: {e}")
+            print(f"Error importing deck from TXT: {e}")
             return None
     
     def export_deck_to_txt(self, deck: Deck, file_path: str) -> bool:
-        """Exporta un mazo a un archivo de texto (formato común)"""
+        """Exports a deck to a text file (common format)"""
         try:
             path = Path(file_path)
             
@@ -139,9 +139,9 @@ class DeckService:
                 f.write(f"// {deck.name}\n")
                 if deck.description:
                     f.write(f"// {deck.description}\n")
-                f.write(f"// Formato: {deck.format or 'No especificado'}\n\n")
+                f.write(f"// Format: {deck.format or 'Not specified'}\n\n")
                 
-                # Agrupar por tipos
+                # Group by types
                 creatures = deck.get_cards_by_type('Creature')
                 instants = deck.get_cards_by_type('Instant')
                 sorceries = deck.get_cards_by_type('Sorcery')
@@ -152,33 +152,33 @@ class DeckService:
                 other = [card for card in deck.cards if not any(card in group for group in 
                          [creatures, instants, sorceries, enchantments, artifacts, planeswalkers, lands])]
                 
-                # Escribir por secciones
+                # Write by sections
                 if creatures:
-                    f.write("// Criaturas\n")
+                    f.write("// Creatures\n")
                     for card in sorted(creatures, key=lambda c: c.card_name):
                         f.write(f"{card.quantity}x {card.card_name}\n")
                     f.write("\n")
                 
                 if instants:
-                    f.write("// Instantáneos\n")
+                    f.write("// Instants\n")
                     for card in sorted(instants, key=lambda c: c.card_name):
                         f.write(f"{card.quantity}x {card.card_name}\n")
                     f.write("\n")
                 
                 if sorceries:
-                    f.write("// Conjuros\n")
+                    f.write("// Sorceries\n")
                     for card in sorted(sorceries, key=lambda c: c.card_name):
                         f.write(f"{card.quantity}x {card.card_name}\n")
                     f.write("\n")
                 
                 if enchantments:
-                    f.write("// Encantamientos\n")
+                    f.write("// Enchantments\n")
                     for card in sorted(enchantments, key=lambda c: c.card_name):
                         f.write(f"{card.quantity}x {card.card_name}\n")
                     f.write("\n")
                 
                 if artifacts:
-                    f.write("// Artefactos\n")
+                    f.write("// Artifacts\n")
                     for card in sorted(artifacts, key=lambda c: c.card_name):
                         f.write(f"{card.quantity}x {card.card_name}\n")
                     f.write("\n")
@@ -190,33 +190,33 @@ class DeckService:
                     f.write("\n")
                 
                 if lands:
-                    f.write("// Tierras\n")
+                    f.write("// Lands\n")
                     for card in sorted(lands, key=lambda c: c.card_name):
                         f.write(f"{card.quantity}x {card.card_name}\n")
                     f.write("\n")
                 
                 if other:
-                    f.write("// Otros\n")
+                    f.write("// Others\n")
                     for card in sorted(other, key=lambda c: c.card_name):
                         f.write(f"{card.quantity}x {card.card_name}\n")
             
             return True
         except Exception as e:
-            print(f"Error al exportar mazo a TXT: {e}")
+            print(f"Error exporting deck to TXT: {e}")
             return False
     
     def import_deck_from_edhrec(self, url: str, deck_name: str) -> Optional[Deck]:
-        """Importa un mazo desde EDHREC (simplificado)"""
-        # Implementación simplificada - en un proyecto real se usaría web scraping
-        # o una API si está disponible
-        print(f"Importación desde EDHREC no implementada completamente: {url}")
+        """Imports a deck from EDHREC (simplified)"""
+        # Simplified implementation - in a real project web scraping would be used
+        # or an API if available
+        print(f"EDHREC import not fully implemented: {url}")
         
-        # Crear un mazo vacío como ejemplo
+        # Create an empty deck as example
         deck = self.create_deck(deck_name, format="Commander")
         return deck
     
     def compare_with_collection(self, deck: Deck) -> Dict[str, Any]:
-        """Compara un mazo con la colección del usuario"""
+        """Compares a deck with the user's collection"""
         collection_cards = self.card_service.load_cards()
         collection_by_name = {card.card_name.lower(): card for card in collection_cards if card.card_name}
         
@@ -265,7 +265,7 @@ class DeckService:
         }
     
     def analyze_deck(self, deck: Deck) -> Dict[str, Any]:
-        """Analiza un mazo y proporciona estadísticas"""
+        """Analyzes a deck and provides statistics"""
         return {
             'name': deck.name,
             'format': deck.format,
@@ -284,8 +284,8 @@ class DeckService:
         }
     
     def _safe_filename(self, name: str) -> str:
-        """Convierte un nombre a un nombre de archivo seguro"""
-        # Reemplazar caracteres no seguros
+        """Converts a name to a safe filename"""
+        # Replace unsafe characters
         safe_name = ""
         for char in name:
             if char.isalnum() or char in "_- ":
@@ -293,10 +293,10 @@ class DeckService:
             else:
                 safe_name += "_"
         
-        # Eliminar espacios al inicio y final y reemplazar múltiples espacios
+        # Remove leading and trailing spaces and replace multiple spaces
         safe_name = safe_name.strip().replace("  ", " ")
         
-        # Reemplazar espacios por guiones
+        # Replace spaces with hyphens
         safe_name = safe_name.replace(" ", "-")
         
         return safe_name

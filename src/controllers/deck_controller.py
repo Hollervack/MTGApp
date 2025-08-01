@@ -1,4 +1,4 @@
-"""Controlador para gestión de mazos MTG"""
+"""Controller for MTG deck management"""
 
 import logging
 from typing import List, Dict, Any, Optional
@@ -11,7 +11,7 @@ from ..services.card_service import CardService
 
 
 class DeckController:
-    """Controlador para operaciones con mazos"""
+    """Controller for deck operations"""
     
     def __init__(self, deck_service: DeckService, card_service: CardService):
         self.deck_service = deck_service
@@ -21,253 +21,253 @@ class DeckController:
     
     def create_new_deck(self, name: str, format: Optional[str] = None, 
                        description: Optional[str] = None) -> bool:
-        """Crea un nuevo mazo y lo establece como actual"""
+        """Creates a new deck and sets it as current"""
         try:
             self.current_deck = self.deck_service.create_deck(name, format, description)
-            self.logger.info(f"Nuevo mazo creado: {name}")
+            self.logger.info(f"New deck created: {name}")
             return True
         except Exception as e:
-            self.logger.error(f"Error al crear nuevo mazo: {e}")
+            self.logger.error(f"Error creating new deck: {e}")
             return False
     
     def load_deck(self, filename: str) -> bool:
-        """Carga un mazo desde archivo"""
+        """Loads a deck from file"""
         try:
             deck = self.deck_service.load_deck(filename)
             if deck:
                 self.current_deck = deck
-                self.logger.info(f"Mazo cargado: {deck.name}")
+                self.logger.info(f"Deck loaded: {deck.name}")
                 return True
             else:
-                self.logger.warning(f"No se pudo cargar el mazo: {filename}")
+                self.logger.warning(f"Could not load deck: {filename}")
                 return False
         except Exception as e:
-            self.logger.error(f"Error al cargar mazo: {e}")
+            self.logger.error(f"Error loading deck: {e}")
             return False
     
     def save_current_deck(self) -> bool:
-        """Guarda el mazo actual"""
+        """Saves the current deck"""
         if not self.current_deck:
-            self.logger.warning("No hay mazo actual para guardar")
+            self.logger.warning("No current deck to save")
             return False
         
         try:
             success = self.deck_service.save_deck(self.current_deck)
             if success:
-                self.logger.info(f"Mazo guardado: {self.current_deck.name}")
+                self.logger.info(f"Deck saved: {self.current_deck.name}")
             return success
         except Exception as e:
-            self.logger.error(f"Error al guardar mazo: {e}")
+            self.logger.error(f"Error saving deck: {e}")
             return False
     
     def save_deck_as(self, new_name: str) -> bool:
-        """Guarda el mazo actual con un nuevo nombre"""
+        """Saves the current deck with a new name"""
         if not self.current_deck:
-            self.logger.warning("No hay mazo actual para guardar")
+            self.logger.warning("No current deck to save")
             return False
         
         try:
-            # Crear una copia del mazo con el nuevo nombre
+            # Create a copy of the deck with the new name
             old_name = self.current_deck.name
             self.current_deck.name = new_name
             
             success = self.deck_service.save_deck(self.current_deck)
             
             if success:
-                self.logger.info(f"Mazo guardado como: {new_name} (antes: {old_name})")
+                self.logger.info(f"Deck saved as: {new_name} (previously: {old_name})")
             else:
-                # Restaurar el nombre original si falló
+                # Restore original name if failed
                 self.current_deck.name = old_name
             
             return success
         except Exception as e:
-            self.logger.error(f"Error al guardar mazo como {new_name}: {e}")
+            self.logger.error(f"Error saving deck as {new_name}: {e}")
             return False
     
     def add_card_to_deck(self, card_name: str, quantity: int = 1) -> bool:
-        """Añade una carta al mazo actual"""
+        """Adds a card to the current deck"""
         if not self.current_deck:
-            self.logger.warning("No hay mazo actual")
+            self.logger.warning("No current deck")
             return False
         
         try:
             card = self.card_service.find_card_by_name(card_name)
             if not card:
-                self.logger.warning(f"Carta no encontrada: {card_name}")
+                self.logger.warning(f"Card not found: {card_name}")
                 return False
             
             self.current_deck.add_card(card, quantity)
-            self.logger.info(f"Añadida {quantity}x {card_name} al mazo {self.current_deck.name}")
+            self.logger.info(f"Added {quantity}x {card_name} to deck {self.current_deck.name}")
             return True
         except Exception as e:
-            self.logger.error(f"Error al añadir carta al mazo: {e}")
+            self.logger.error(f"Error adding card to deck: {e}")
             return False
     
     def remove_card_from_deck(self, card_name: str, quantity: Optional[int] = None) -> bool:
-        """Elimina una carta del mazo actual"""
+        """Removes a card from the current deck"""
         if not self.current_deck:
-            self.logger.warning("No hay mazo actual")
+            self.logger.warning("No current deck")
             return False
         
         try:
             card = self.card_service.find_card_by_name(card_name)
             if not card:
-                self.logger.warning(f"Carta no encontrada: {card_name}")
+                self.logger.warning(f"Card not found: {card_name}")
                 return False
             
             success = self.current_deck.remove_card(card, quantity)
             if success:
-                removed_qty = quantity if quantity else "todas las copias de"
-                self.logger.info(f"Eliminada {removed_qty} {card_name} del mazo {self.current_deck.name}")
+                removed_qty = quantity if quantity else "all copies of"
+                self.logger.info(f"Removed {removed_qty} {card_name} from deck {self.current_deck.name}")
             return success
         except Exception as e:
-            self.logger.error(f"Error al eliminar carta del mazo: {e}")
+            self.logger.error(f"Error removing card from deck: {e}")
             return False
     
     def update_card_quantity(self, card_name: str, new_quantity: int) -> bool:
-        """Actualiza la cantidad de una carta en el mazo"""
+        """Updates the quantity of a card in the deck"""
         if not self.current_deck:
-            self.logger.warning("No hay mazo actual")
+            self.logger.warning("No current deck")
             return False
         
         try:
             card = self.card_service.find_card_by_name(card_name)
             if not card:
-                self.logger.warning(f"Carta no encontrada: {card_name}")
+                self.logger.warning(f"Card not found: {card_name}")
                 return False
             
-            # Encontrar la carta en el mazo
+            # Find the card in the deck
             deck_card = self.current_deck.find_card(card.card_name)
             if not deck_card:
-                # Si no está en el mazo, añadirla
+                # If not in deck, add it
                 if new_quantity > 0:
                     return self.add_card_to_deck(card_name, new_quantity)
                 return True
             
-            # Actualizar cantidad
+            # Update quantity
             if new_quantity <= 0:
                 return self.remove_card_from_deck(card_name)
             else:
                 deck_card.quantity = new_quantity
-                self.logger.info(f"Actualizada cantidad de {card_name} a {new_quantity} en {self.current_deck.name}")
+                self.logger.info(f"Updated quantity of {card_name} to {new_quantity} in {self.current_deck.name}")
                 return True
         except Exception as e:
-            self.logger.error(f"Error al actualizar cantidad de carta: {e}")
+            self.logger.error(f"Error updating card quantity: {e}")
             return False
     
     def import_deck_from_file(self, file_path: str, deck_name: str) -> bool:
-        """Importa un mazo desde un archivo"""
+        """Imports a deck from a file"""
         try:
             path = Path(file_path)
             
             if not path.exists():
-                self.logger.error(f"Archivo no encontrado: {file_path}")
+                self.logger.error(f"File not found: {file_path}")
                 return False
             
-            # Determinar formato por extensión
+            # Determine format by extension
             if path.suffix.lower() == '.txt':
                 deck = self.deck_service.import_deck_from_txt(file_path, deck_name)
             else:
-                self.logger.error(f"Formato de archivo no soportado: {path.suffix}")
+                self.logger.error(f"Unsupported file format: {path.suffix}")
                 return False
             
             if deck:
                 self.current_deck = deck
-                self.logger.info(f"Mazo importado desde {file_path}: {deck_name}")
+                self.logger.info(f"Deck imported from {file_path}: {deck_name}")
                 return True
             else:
-                self.logger.error(f"Error al importar mazo desde {file_path}")
+                self.logger.error(f"Error importing deck from {file_path}")
                 return False
         except Exception as e:
-            self.logger.error(f"Error al importar mazo: {e}")
+            self.logger.error(f"Error importing deck: {e}")
             return False
     
     def export_deck_to_file(self, file_path: str) -> bool:
-        """Exporta el mazo actual a un archivo"""
+        """Exports the current deck to a file"""
         if not self.current_deck:
-            self.logger.warning("No hay mazo actual para exportar")
+            self.logger.warning("No current deck to export")
             return False
         
         try:
             path = Path(file_path)
             
-            # Determinar formato por extensión
+            # Determine format by extension
             if path.suffix.lower() == '.txt':
                 success = self.deck_service.export_deck_to_txt(self.current_deck, file_path)
             else:
-                self.logger.error(f"Formato de exportación no soportado: {path.suffix}")
+                self.logger.error(f"Unsupported export format: {path.suffix}")
                 return False
             
             if success:
-                self.logger.info(f"Mazo exportado a {file_path}")
+                self.logger.info(f"Deck exported to {file_path}")
             return success
         except Exception as e:
-            self.logger.error(f"Error al exportar mazo: {e}")
+            self.logger.error(f"Error exporting deck: {e}")
             return False
     
     def get_deck_analysis(self) -> Optional[Dict[str, Any]]:
-        """Obtiene análisis del mazo actual"""
+        """Gets analysis of the current deck"""
         if not self.current_deck:
             return None
         
         try:
             return self.deck_service.analyze_deck(self.current_deck)
         except Exception as e:
-            self.logger.error(f"Error al analizar mazo: {e}")
+            self.logger.error(f"Error analyzing deck: {e}")
             return None
     
     def compare_with_collection(self) -> Optional[Dict[str, Any]]:
-        """Compara el mazo actual con la colección"""
+        """Compares the current deck with the collection"""
         if not self.current_deck:
             return None
         
         try:
             return self.deck_service.compare_with_collection(self.current_deck)
         except Exception as e:
-            self.logger.error(f"Error al comparar con colección: {e}")
+            self.logger.error(f"Error comparing with collection: {e}")
             return None
     
     def get_available_decks(self) -> List[Dict[str, Any]]:
-        """Obtiene lista de mazos disponibles"""
+        """Gets list of available decks"""
         try:
             return self.deck_service.list_decks()
         except Exception as e:
-            self.logger.error(f"Error al listar mazos: {e}")
+            self.logger.error(f"Error listing decks: {e}")
             return []
     
     def delete_deck(self, filename: str) -> bool:
-        """Elimina un mazo"""
+        """Deletes a deck"""
         try:
             success = self.deck_service.delete_deck(filename)
             if success:
-                self.logger.info(f"Mazo eliminado: {filename}")
+                self.logger.info(f"Deck deleted: {filename}")
                 
-                # Si el mazo eliminado es el actual, limpiar referencia
+                # If deleted deck is current, clear reference
                 if (self.current_deck and 
                     self.deck_service._safe_filename(self.current_deck.name) + '.json' == filename):
                     self.current_deck = None
             
             return success
         except Exception as e:
-            self.logger.error(f"Error al eliminar mazo: {e}")
+            self.logger.error(f"Error deleting deck: {e}")
             return False
     
     def clear_current_deck(self):
-        """Limpia el mazo actual"""
+        """Clears the current deck"""
         if self.current_deck:
-            self.logger.info(f"Limpiando mazo actual: {self.current_deck.name}")
+            self.logger.info(f"Clearing current deck: {self.current_deck.name}")
         self.current_deck = None
     
     def get_current_deck(self) -> Optional[Deck]:
-        """Obtiene el mazo actual"""
+        """Gets the current deck"""
         return self.current_deck
     
     def has_current_deck(self) -> bool:
-        """Verifica si hay un mazo actual"""
+        """Checks if there is a current deck"""
         return self.current_deck is not None
     
     def get_deck_summary(self) -> Optional[Dict[str, Any]]:
-        """Obtiene resumen del mazo actual"""
+        """Gets summary of the current deck"""
         if not self.current_deck:
             return None
         
@@ -283,54 +283,54 @@ class DeckController:
                 'is_legal': self.current_deck.is_format_legal() if self.current_deck.format else None
             }
         except Exception as e:
-            self.logger.error(f"Error al obtener resumen del mazo: {e}")
+            self.logger.error(f"Error getting deck summary: {e}")
             return None
     
     def validate_deck_format(self) -> Dict[str, Any]:
-        """Valida el mazo actual según su formato"""
+        """Validates the current deck according to its format"""
         if not self.current_deck:
-            return {'valid': False, 'errors': ['No hay mazo actual']}
+            return {'valid': False, 'errors': ['No current deck']}
         
         try:
             errors = []
             warnings = []
             
-            # Validaciones básicas
+            # Basic validations
             if not self.current_deck.name.strip():
-                errors.append("El mazo debe tener un nombre")
+                errors.append("Deck must have a name")
             
             if self.current_deck.total_cards == 0:
-                errors.append("El mazo no puede estar vacío")
+                errors.append("Deck cannot be empty")
             
-            # Validaciones específicas por formato
+            # Format-specific validations
             if self.current_deck.format:
                 format_lower = self.current_deck.format.lower()
                 
                 if format_lower == 'standard':
                     if self.current_deck.total_cards < 60:
-                        errors.append("Standard requiere mínimo 60 cartas")
+                        errors.append("Standard requires minimum 60 cards")
                     elif self.current_deck.total_cards > 60:
-                        warnings.append("Standard típicamente usa exactamente 60 cartas")
+                        warnings.append("Standard typically uses exactly 60 cards")
                 
                 elif format_lower == 'commander' or format_lower == 'edh':
                     if self.current_deck.total_cards != 100:
-                        errors.append("Commander requiere exactamente 100 cartas")
+                        errors.append("Commander requires exactly 100 cards")
                     
-                    # Verificar que no hay más de 1 copia de cada carta (excepto tierras básicas)
+                    # Verify no more than 1 copy of each card (except basic lands)
                     for card in self.current_deck.cards:
                         if (card.quantity > 1 and 
                             not (card.type_line and 'Basic' in card.type_line and 'Land' in card.type_line)):
-                            errors.append(f"Commander permite máximo 1 copia de {card.card_name}")
+                            errors.append(f"Commander allows maximum 1 copy of {card.card_name}")
                 
                 elif format_lower == 'modern':
                     if self.current_deck.total_cards < 60:
-                        errors.append("Modern requiere mínimo 60 cartas")
+                        errors.append("Modern requires minimum 60 cards")
                     
-                    # Verificar límite de 4 copias
+                    # Verify 4-copy limit
                     for card in self.current_deck.cards:
                         if (card.quantity > 4 and 
                             not (card.type_line and 'Basic' in card.type_line and 'Land' in card.type_line)):
-                            errors.append(f"Modern permite máximo 4 copias de {card.card_name}")
+                            errors.append(f"Modern allows maximum 4 copies of {card.card_name}")
             
             return {
                 'valid': len(errors) == 0,
@@ -338,5 +338,5 @@ class DeckController:
                 'warnings': warnings
             }
         except Exception as e:
-            self.logger.error(f"Error al validar formato del mazo: {e}")
-            return {'valid': False, 'errors': [f'Error de validación: {e}']}
+            self.logger.error(f"Error validating deck format: {e}")
+            return {'valid': False, 'errors': [f'Validation error: {e}']}

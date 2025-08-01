@@ -1,4 +1,4 @@
-"""Configuraciones de la aplicación MTG Deck Constructor"""
+"""Configuration settings for the MTG Deck Constructor application"""
 
 import os
 from pathlib import Path
@@ -7,7 +7,7 @@ import json
 
 
 class Settings:
-    """Clase para gestionar las configuraciones de la aplicación"""
+    """Class for managing application configurations"""
     
     def __init__(self, config_file: Optional[str] = None):
         self.config_file = config_file or self._get_default_config_path()
@@ -15,15 +15,15 @@ class Settings:
         self._load_from_file()
     
     def _get_default_config_path(self) -> str:
-        """Obtiene la ruta por defecto del archivo de configuración"""
-        # Buscar en el directorio del proyecto
+        """Gets the default path for the configuration file"""
+        # Search in the project directory
         project_root = Path(__file__).parent.parent.parent
         return str(project_root / 'config.json')
     
     def _load_default_settings(self) -> Dict[str, Any]:
-        """Carga las configuraciones por defecto"""
+        """Loads default configurations"""
         return {
-            # Configuraciones de la aplicación
+            # Application settings
             'app': {
                 'name': 'MTG Deck Constructor',
                 'version': '1.0.0',
@@ -31,7 +31,7 @@ class Settings:
                 'language': 'es'
             },
             
-            # Configuraciones de la interfaz
+            # Interface configurations
             'ui': {
                 'theme': 'default',
                 'window_width': 1200,
@@ -42,7 +42,7 @@ class Settings:
                 'font_size': 10
             },
             
-            # Configuraciones de datos
+            # Data configurations
             'data': {
                 'cards_file': 'data/databaseMTG.csv',
                 'decks_directory': 'data/decks',
@@ -53,7 +53,7 @@ class Settings:
                 'backup_interval_days': 7
             },
             
-            # Configuraciones de imágenes
+            # Image configurations
             'images': {
                 'cache_enabled': True,
                 'cache_size_mb': 500,
@@ -64,16 +64,16 @@ class Settings:
                 'timeout_seconds': 30
             },
             
-            # Configuraciones de API externa
+            # External API configurations
             'api': {
                 'scryfall_base_url': 'https://api.scryfall.com',
-                'rate_limit_delay': 0.1,  # segundos entre requests
+                'rate_limit_delay': 0.1,  # seconds between requests
                 'max_retries': 3,
                 'timeout_seconds': 30,
                 'user_agent': 'MTG Deck Constructor/1.0'
             },
             
-            # Configuraciones de importación/exportación
+            # Import/export configurations
             'import_export': {
                 'supported_formats': ['txt', 'json', 'csv'],
                 'default_export_format': 'txt',
@@ -81,7 +81,7 @@ class Settings:
                 'auto_detect_format': True
             },
             
-            # Configuraciones de análisis
+            # Analysis configurations
             'analysis': {
                 'enable_mana_curve': True,
                 'enable_color_analysis': True,
@@ -91,7 +91,7 @@ class Settings:
                 'cache_analysis_results': True
             },
             
-            # Configuraciones de logging
+            # Logging configurations
             'logging': {
                 'level': 'INFO',  # DEBUG, INFO, WARNING, ERROR, CRITICAL
                 'file_enabled': True,
@@ -103,19 +103,19 @@ class Settings:
         }
     
     def _load_from_file(self):
-        """Carga configuraciones desde archivo"""
+        """Loads configurations from file"""
         try:
             if os.path.exists(self.config_file):
                 with open(self.config_file, 'r', encoding='utf-8') as f:
                     file_settings = json.load(f)
                 
-                # Fusionar configuraciones del archivo con las por defecto
+                # Merge file configurations with defaults
                 self._merge_settings(self._settings, file_settings)
         except Exception as e:
-            print(f"Error al cargar configuraciones desde archivo: {e}")
+            print(f"Error loading configurations from file: {e}")
     
     def _merge_settings(self, default: Dict[str, Any], override: Dict[str, Any]):
-        """Fusiona configuraciones recursivamente"""
+        """Merges configurations recursively"""
         for key, value in override.items():
             if key in default and isinstance(default[key], dict) and isinstance(value, dict):
                 self._merge_settings(default[key], value)
@@ -123,7 +123,7 @@ class Settings:
                 default[key] = value
     
     def get(self, key: str, default: Any = None) -> Any:
-        """Obtiene una configuración usando notación de punto"""
+        """Gets a configuration using dot notation"""
         keys = key.split('.')
         value = self._settings
         
@@ -135,23 +135,23 @@ class Settings:
             return default
     
     def set(self, key: str, value: Any):
-        """Establece una configuración usando notación de punto"""
+        """Sets a configuration using dot notation"""
         keys = key.split('.')
         current = self._settings
         
-        # Navegar hasta el penúltimo nivel
+        # Navigate to the second-to-last level
         for k in keys[:-1]:
             if k not in current:
                 current[k] = {}
             current = current[k]
         
-        # Establecer el valor final
+        # Set the final value
         current[keys[-1]] = value
     
     def save(self) -> bool:
-        """Guarda las configuraciones actuales al archivo"""
+        """Saves current configurations to file"""
         try:
-            # Crear directorio si no existe
+            # Create directory if it doesn't exist
             config_path = Path(self.config_file)
             config_path.parent.mkdir(parents=True, exist_ok=True)
             
@@ -160,22 +160,22 @@ class Settings:
             
             return True
         except Exception as e:
-            print(f"Error al guardar configuraciones: {e}")
+            print(f"Error saving configurations: {e}")
             return False
     
     def reset_to_defaults(self):
-        """Restablece todas las configuraciones a los valores por defecto"""
+        """Resets all configurations to default values"""
         self._settings = self._load_default_settings()
     
     def get_all(self) -> Dict[str, Any]:
-        """Obtiene todas las configuraciones"""
+        """Gets all configurations"""
         return self._settings.copy()
     
     def update(self, settings: Dict[str, Any]):
-        """Actualiza múltiples configuraciones"""
+        """Updates multiple configurations"""
         self._merge_settings(self._settings, settings)
     
-    # Propiedades de acceso rápido para configuraciones comunes
+    # Quick access properties for common configurations
     @property
     def app_name(self) -> str:
         return self.get('app.name', 'MTG Deck Constructor')
@@ -225,12 +225,12 @@ class Settings:
         return self.get('api.rate_limit_delay', 0.1)
 
 
-# Instancia global de configuraciones
+# Global instance of configurations
 _settings_instance: Optional[Settings] = None
 
 
 def get_settings(config_file: Optional[str] = None) -> Settings:
-    """Obtiene la instancia global de configuraciones"""
+    """Gets the global configuration instance"""
     global _settings_instance
     
     if _settings_instance is None or config_file is not None:
@@ -240,6 +240,6 @@ def get_settings(config_file: Optional[str] = None) -> Settings:
 
 
 def reload_settings(config_file: Optional[str] = None):
-    """Recarga las configuraciones"""
+    """Reloads configurations"""
     global _settings_instance
     _settings_instance = Settings(config_file)

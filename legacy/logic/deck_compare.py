@@ -1,50 +1,50 @@
 import csv
 
-def cargar_baraja_edhrec(filepath):
-    baraja = {}
+def load_edhrec_deck(filepath):
+    deck = {}
     with open(filepath, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
-        columnas = [col.strip() for col in reader.fieldnames]
+        columns = [col.strip() for col in reader.fieldnames]
 
-        # Buscar columna correcta
-        columna_nombre = next((col for col in columnas if col.lower() in ['card', 'name', 'card name']), None)
-        if not columna_nombre:
-            raise ValueError("No se encontró ninguna columna válida para el nombre de carta (Card/Name).")
+        # Find correct column
+        name_column = next((col for col in columns if col.lower() in ['card', 'name', 'card name']), None)
+        if not name_column:
+            raise ValueError("No valid column found for card name (Card/Name).")
 
         for row in reader:
-            nombre = row[columna_nombre].strip()
-            if nombre:
-                baraja[nombre] = baraja.get(nombre, 0) + 1
-    return baraja
+            name = row[name_column].strip()
+            if name:
+                deck[name] = deck.get(name, 0) + 1
+    return deck
 
-def comparar_con_coleccion(baraja, coleccion):
-    cartas_coleccion = {}
-    cartas_incompletas = []
+def compare_with_collection(deck, collection):
+    collection_cards = {}
+    incomplete_cards = []
 
-    for carta in coleccion:
-        nombre = (carta.get('english_card_name') or '').strip()
-        if not nombre:
-            cartas_incompletas.append(carta)
+    for card in collection:
+        name = (card.get('english_card_name') or '').strip()
+        if not name:
+            incomplete_cards.append(card)
             continue
-        cantidad = carta['quantity']
-        cartas_coleccion[nombre] = cartas_coleccion.get(nombre, 0) + cantidad
+        quantity = card['quantity']
+        collection_cards[name] = collection_cards.get(name, 0) + quantity
 
-    # Guardar log de cartas incompletas
-    if cartas_incompletas:
-        with open('cartas_incompletas_log.csv', 'w', newline='', encoding='utf-8') as f:
-            fieldnames = coleccion[0].keys()
+    # Save log of incomplete cards
+    if incomplete_cards:
+        with open('incomplete_cards_log.csv', 'w', newline='', encoding='utf-8') as f:
+            fieldnames = collection[0].keys()
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
-            writer.writerows(cartas_incompletas)
+            writer.writerows(incomplete_cards)
 
-    faltantes = []
-    for nombre, necesarios in baraja.items():
-        en_coleccion = cartas_coleccion.get(nombre, 0)
-        if en_coleccion < necesarios:
-            faltantes.append({
-                'Card': nombre,
-                'Owned': en_coleccion,
-                'Needed': necesarios,
-                'Missing': necesarios - en_coleccion
+    missing = []
+    for name, needed in deck.items():
+        in_collection = collection_cards.get(name, 0)
+        if in_collection < needed:
+            missing.append({
+                'Card': name,
+                'Owned': in_collection,
+                'Needed': needed,
+                'Missing': needed - in_collection
             })
-    return faltantes
+    return missing

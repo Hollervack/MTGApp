@@ -2,7 +2,7 @@ import unittest
 import sys
 import os
 
-# Agregar el directorio src al path
+# Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from models.card import Card
@@ -10,10 +10,10 @@ from models.deck import Deck
 
 
 class TestCard(unittest.TestCase):
-    """Tests para el modelo Card"""
+    """Tests for Card model"""
     
     def setUp(self):
-        """Configuración inicial para cada test"""
+        """Initial setup for each test"""
         self.card_data = {
             'card_name': 'Lightning Bolt',
             'mana_cost': '{R}',
@@ -29,7 +29,7 @@ class TestCard(unittest.TestCase):
         }
     
     def test_card_creation(self):
-        """Test creación básica de carta"""
+        """Test basic card creation"""
         card = Card(**self.card_data)
         self.assertEqual(card.card_name, 'Lightning Bolt')
         self.assertEqual(card.mana_cost, '{R}')
@@ -37,12 +37,12 @@ class TestCard(unittest.TestCase):
         self.assertEqual(card.colors, ['R'])
     
     def test_card_is_creature(self):
-        """Test identificación de criaturas"""
-        # Carta que no es criatura
+        """Test creature identification"""
+        # Card that is not a creature
         card = Card(**self.card_data)
         self.assertFalse(card.is_creature)
         
-        # Carta que es criatura
+        # Card that is a creature
         creature_data = self.card_data.copy()
         creature_data.update({
             'type_line': 'Creature — Human Wizard',
@@ -53,14 +53,14 @@ class TestCard(unittest.TestCase):
         self.assertTrue(creature.is_creature)
     
     def test_card_colors(self):
-        """Test manejo de colores"""
+        """Test color handling"""
         card = Card(**self.card_data)
         self.assertEqual(card.colors, ['R'])
         self.assertIn('R', card.colors)
         self.assertNotIn('U', card.colors)
     
     def test_card_multicolor(self):
-        """Test carta multicolor"""
+        """Test multicolor card"""
         multicolor_data = self.card_data.copy()
         multicolor_data.update({
             'colors': ['R', 'U'],
@@ -71,20 +71,20 @@ class TestCard(unittest.TestCase):
         self.assertIn('U', card.colors)
     
     def test_card_string_representation(self):
-        """Test representación en string"""
+        """Test string representation"""
         card = Card(**self.card_data)
         self.assertEqual(card.display_name, 'Lightning Bolt')
         self.assertIn('Lightning Bolt', str(card))
 
 
 class TestDeck(unittest.TestCase):
-    """Tests para el modelo Deck"""
+    """Tests for Deck model"""
     
     def setUp(self):
-        """Configuración inicial para cada test"""
+        """Initial setup for each test"""
         self.deck = Deck(name="Test Deck")
         
-        # Crear cartas de prueba
+        # Create test cards
         self.lightning_bolt = Card(
             card_name='Lightning Bolt',
             mana_cost='{R}',
@@ -102,13 +102,13 @@ class TestDeck(unittest.TestCase):
         )
     
     def test_deck_creation(self):
-        """Test creación básica de mazo"""
+        """Test basic deck creation"""
         self.assertEqual(self.deck.name, "Test Deck")
         self.assertEqual(len(self.deck.cards), 0)
         self.assertEqual(self.deck.total_cards, 0)
     
     def test_add_card(self):
-        """Test agregar cartas al mazo"""
+        """Test add cards to deck"""
         self.deck.add_card(self.lightning_bolt, 4)
         self.assertEqual(len(self.deck.cards), 1)
         self.assertEqual(self.deck.total_cards, 4)
@@ -116,21 +116,21 @@ class TestDeck(unittest.TestCase):
         self.assertEqual(found_card.quantity, 4)
     
     def test_remove_card(self):
-        """Test remover cartas del mazo"""
+        """Test remove cards from deck"""
         self.deck.add_card(self.lightning_bolt, 4)
         self.deck.remove_card(self.lightning_bolt.card_name, 2)
         found_card = self.deck.find_card(self.lightning_bolt.card_name)
         self.assertEqual(found_card.quantity, 2)
         self.assertEqual(self.deck.total_cards, 2)
         
-        # Remover todas las cartas
+        # Remove all cards
         self.deck.remove_card(self.lightning_bolt.card_name, 2)
         found_card = self.deck.find_card(self.lightning_bolt.card_name)
         self.assertIsNone(found_card)
         self.assertEqual(self.deck.total_cards, 0)
     
     def test_deck_colors(self):
-        """Test identificación de colores del mazo"""
+        """Test deck color identification"""
         self.deck.add_card(self.lightning_bolt, 4)
         self.deck.add_card(self.counterspell, 4)
         
@@ -139,24 +139,24 @@ class TestDeck(unittest.TestCase):
         self.assertIn('U', colors)
     
     def test_mana_curve(self):
-        """Test curva de maná"""
+        """Test mana curve"""
         self.deck.add_card(self.lightning_bolt, 4)
         self.deck.add_card(self.counterspell, 4)
         
         curve = self.deck.mana_curve
-        # Verificar que la curva contiene las cartas agregadas
+        # Verify that curve contains added cards
         self.assertGreater(sum(curve.values()), 0)
     
     def test_deck_validation(self):
-        """Test validación de mazo"""
-        # Mazo vacío no es válido para formatos que requieren mínimo de cartas
+        """Test deck validation"""
+        # Empty deck is not valid for formats that require minimum cards
         self.assertEqual(self.deck.total_cards, 0)
         
-        # Agregar suficientes cartas
+        # Add enough cards
         for i in range(60):
             self.deck.add_card(self.lightning_bolt, 1)
         
-        # Ahora debería tener 60 cartas
+        # Should now have 60 cards
         self.assertTrue(self.deck.total_cards >= 60)
         
         # Test format validation if available
@@ -164,16 +164,16 @@ class TestDeck(unittest.TestCase):
             self.assertTrue(self.deck.is_legal_format('standard'))
     
     def test_deck_export_import(self):
-        """Test exportar e importar mazo"""
+        """Test export and import deck"""
         self.deck.add_card(self.lightning_bolt, 4)
         self.deck.add_card(self.counterspell, 4)
         
-        # Exportar
+        # Export
         deck_data = self.deck.to_dict()
         self.assertEqual(deck_data['name'], 'Test Deck')
         self.assertEqual(len(deck_data['cards']), 2)
         
-        # Importar
+        # Import
         new_deck = Deck.from_dict(deck_data)
         self.assertEqual(new_deck.name, 'Test Deck')
         self.assertEqual(new_deck.total_cards, 8)

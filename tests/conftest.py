@@ -1,7 +1,7 @@
-"""Configuración y fixtures compartidas para todos los tests
+"""Shared configuration and fixtures for all tests
 
-Este archivo contiene fixtures de pytest que pueden ser utilizadas
-en cualquier test del proyecto.
+This file contains pytest fixtures that can be used
+in any test in the project.
 """
 
 import pytest
@@ -12,7 +12,7 @@ import sys
 import pandas as pd
 from unittest.mock import Mock
 
-# Agregar el directorio src al path
+# Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from models.card import Card
@@ -23,7 +23,7 @@ from services.deck_service import DeckService
 
 @pytest.fixture
 def sample_cards_data():
-    """Datos de cartas de ejemplo para tests"""
+    """Sample card data for tests"""
     return pd.DataFrame([
         {
             'name': 'Lightning Bolt',
@@ -110,7 +110,7 @@ def sample_cards_data():
 
 @pytest.fixture
 def sample_cards(sample_cards_data):
-    """Lista de objetos Card de ejemplo"""
+    """List of sample Card objects"""
     cards = []
     for _, row in sample_cards_data.iterrows():
         card = Card(
@@ -134,7 +134,7 @@ def sample_cards(sample_cards_data):
 
 @pytest.fixture
 def lightning_bolt():
-    """Carta Lightning Bolt de ejemplo"""
+    """Sample Lightning Bolt card"""
     return Card(
         name='Lightning Bolt',
         mana_cost='{R}',
@@ -152,7 +152,7 @@ def lightning_bolt():
 
 @pytest.fixture
 def counterspell():
-    """Carta Counterspell de ejemplo"""
+    """Sample Counterspell card"""
     return Card(
         name='Counterspell',
         mana_cost='{U}{U}',
@@ -170,7 +170,7 @@ def counterspell():
 
 @pytest.fixture
 def serra_angel():
-    """Carta Serra Angel de ejemplo"""
+    """Sample Serra Angel card"""
     return Card(
         name='Serra Angel',
         mana_cost='{3}{W}{W}',
@@ -190,7 +190,7 @@ def serra_angel():
 
 @pytest.fixture
 def sample_deck(lightning_bolt, counterspell):
-    """Mazo de ejemplo con algunas cartas"""
+    """Sample deck with some cards"""
     deck = Deck(name="Sample Deck")
     deck.add_card(lightning_bolt, 4)
     deck.add_card(counterspell, 4)
@@ -199,13 +199,13 @@ def sample_deck(lightning_bolt, counterspell):
 
 @pytest.fixture
 def empty_deck():
-    """Mazo vacío para tests"""
+    """Empty deck for tests"""
     return Deck(name="Empty Deck")
 
 
 @pytest.fixture
 def temp_directory():
-    """Directorio temporal para tests que requieren archivos"""
+    """Temporary directory for tests that require files"""
     temp_dir = tempfile.mkdtemp()
     yield temp_dir
     shutil.rmtree(temp_dir)
@@ -213,7 +213,7 @@ def temp_directory():
 
 @pytest.fixture
 def temp_cards_file(sample_cards_data, temp_directory):
-    """Archivo CSV temporal con datos de cartas"""
+    """Temporary CSV file with card data"""
     cards_file = os.path.join(temp_directory, 'test_cards.csv')
     sample_cards_data.to_csv(cards_file, index=False)
     return cards_file
@@ -221,7 +221,7 @@ def temp_cards_file(sample_cards_data, temp_directory):
 
 @pytest.fixture
 def temp_decks_directory(temp_directory):
-    """Directorio temporal para mazos"""
+    """Temporary directory for decks"""
     decks_dir = os.path.join(temp_directory, 'decks')
     os.makedirs(decks_dir, exist_ok=True)
     return decks_dir
@@ -229,7 +229,7 @@ def temp_decks_directory(temp_directory):
 
 @pytest.fixture
 def mock_card_service(sample_cards):
-    """Mock del servicio de cartas"""
+    """Mock of the card service"""
     service = Mock(spec=CardService)
     service.cards = sample_cards
     service.search_cards.return_value = sample_cards
@@ -240,7 +240,7 @@ def mock_card_service(sample_cards):
 
 @pytest.fixture
 def mock_deck_service():
-    """Mock del servicio de mazos"""
+    """Mock of the deck service"""
     service = Mock(spec=DeckService)
     service.save_deck.return_value = True
     service.load_deck.return_value = Deck(name="Mock Deck")
@@ -252,7 +252,7 @@ def mock_deck_service():
 
 @pytest.fixture
 def mock_image_service():
-    """Mock del servicio de imágenes"""
+    """Mock of the image service"""
     service = Mock()
     service.download_card_image.return_value = True
     service.get_card_image_path.return_value = '/path/to/image.jpg'
@@ -263,18 +263,18 @@ def mock_image_service():
 
 @pytest.fixture(autouse=True)
 def setup_test_environment():
-    """Configuración automática para todos los tests"""
-    # Configurar variables de entorno para tests
+    """Automatic configuration for all tests"""
+    # Configure environment variables for tests
     os.environ['MTG_TEST_MODE'] = '1'
     
     yield
     
-    # Limpiar después del test
+    # Clean up after test
     if 'MTG_TEST_MODE' in os.environ:
         del os.environ['MTG_TEST_MODE']
 
 
-# Marcadores personalizados para categorizar tests
+# Custom markers to categorize tests
 pytestmark = [
     pytest.mark.filterwarnings("ignore::DeprecationWarning"),
     pytest.mark.filterwarnings("ignore::PendingDeprecationWarning")
@@ -282,28 +282,28 @@ pytestmark = [
 
 
 def pytest_configure(config):
-    """Configuración personalizada de pytest"""
-    # Registrar marcadores personalizados
+    """Custom pytest configuration"""
+    # Register custom markers
     config.addinivalue_line(
-        "markers", "unit: marca test como unitario"
+        "markers", "unit: mark test as unit"
     )
     config.addinivalue_line(
-        "markers", "integration: marca test como de integración"
+        "markers", "integration: mark test as integration"
     )
     config.addinivalue_line(
-        "markers", "slow: marca test como lento"
+        "markers", "slow: mark test as slow"
     )
     config.addinivalue_line(
-        "markers", "network: marca test que requiere red"
+        "markers", "network: mark test that requires network"
     )
     config.addinivalue_line(
-        "markers", "gui: marca test de interfaz gráfica"
+        "markers", "gui: mark test for graphical interface"
     )
 
 
 def pytest_collection_modifyitems(config, items):
-    """Modificar items de test durante la recolección"""
-    # Agregar marcador 'slow' a tests de integración
+    """Modify test items during collection"""
+    # Add 'slow' marker to integration tests
     for item in items:
         if "integration" in item.nodeid:
             item.add_marker(pytest.mark.slow)

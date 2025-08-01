@@ -1,4 +1,4 @@
-"""Vistas de la aplicación MTG Deck Constructor"""
+"""Views for the MTG Deck Constructor application"""
 
 from .main_window import MainWindow
 from .deck_builder_view import DeckBuilderView

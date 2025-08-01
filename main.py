@@ -5,7 +5,7 @@ import sys
 import logging
 from pathlib import Path
 
-# Añadir el directorio src al path para importaciones
+# Add src directory to path for imports
 src_path = Path(__file__).parent / 'src'
 sys.path.insert(0, str(src_path))
 
@@ -15,7 +15,7 @@ from src.config.settings import get_settings
 
 
 def setup_logging():
-    """Configura el logging básico antes de inicializar la aplicación"""
+    """Configures basic logging before initializing the application"""
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -26,35 +26,35 @@ def setup_logging():
 
 
 def main():
-    """Función principal de la aplicación"""
+    """Main application function"""
     try:
-        # Configurar logging básico
+        # Configure basic logging
         setup_logging()
         logger = logging.getLogger('MTGDeckConstructor.Main')
         
-        logger.info("Iniciando MTG Deck Constructor...")
+        logger.info("Inizializing MTG Deck Constructor...")
         
         # Inicializar controlador principal
         app_controller = AppController()
         
-        # Inicializar aplicación
+        # Initialize application
         if not app_controller.initialize_application():
-            logger.error("Error al inicializar la aplicación")
+            logger.error("Error initializing application")
             sys.exit(1)
         
-        # Crear y mostrar ventana principal
+        # Create and show main window
         main_window = MainWindow(app_controller)
         
-        # Ejecutar aplicación
+        # Run application
         main_window.run()
         
-        logger.info("Aplicación cerrada correctamente")
+        logger.info("App closed successfully")
         
     except KeyboardInterrupt:
-        logger.info("Aplicación interrumpida por el usuario")
+        logger.info("App interrupted by user")
         sys.exit(0)
     except Exception as e:
-        logger.error(f"Error crítico en la aplicación: {e}")
+        logger.error(f"Critical error in the application: {e}")
         sys.exit(1)
 
 

@@ -1,157 +1,157 @@
-# Documentación de la API
+# API Documentation
 
-## Arquitectura del Proyecto
+## Project Architecture
 
-El proyecto sigue una arquitectura MVC (Model-View-Controller) con servicios adicionales:
+The project follows an MVC (Model-View-Controller) architecture with additional services:
 
-- **Models**: Representan las entidades de datos (Card, Deck)
-- **Views**: Interfaz de usuario (GUI con tkinter)
-- **Controllers**: Lógica de control entre vistas y servicios
-- **Services**: Lógica de negocio y acceso a datos
+- **Models**: Represent data entities (Card, Deck)
+- **Views**: User interface (GUI with tkinter)
+- **Controllers**: Control logic between views and services
+- **Services**: Business logic and data access
 
-## Servicios Principales
+## Main Services
 
 ### CardService
 
-Gestiona las operaciones relacionadas con cartas.
+Manages card-related operations.
 
-#### Métodos Principales:
+#### Main Methods:
 
-- `load_cards()`: Carga las cartas desde el archivo CSV
-- `search_cards(query, limit=50)`: Busca cartas por nombre
-- `find_card_by_name(name)`: Encuentra una carta específica por nombre
-- `get_cards_by_color(color)`: Filtra cartas por color
-- `get_random_cards(count=10)`: Obtiene cartas aleatorias
-- `get_statistics()`: Obtiene estadísticas de la colección
+- `load_cards()`: Loads cards from CSV file
+- `search_cards(query, limit=50)`: Searches cards by name
+- `find_card_by_name(name)`: Finds a specific card by name
+- `get_cards_by_color(color)`: Filters cards by color
+- `get_random_cards(count=10)`: Gets random cards
+- `get_statistics()`: Gets collection statistics
 
 ### DeckService
 
-Gestiona las operaciones relacionadas con mazos.
+Manages deck-related operations.
 
-#### Métodos Principales:
+#### Main Methods:
 
-- `create_deck(name, format_type='Standard')`: Crea un nuevo mazo
-- `save_deck(deck, filename)`: Guarda un mazo en archivo
-- `load_deck(filename)`: Carga un mazo desde archivo
-- `list_decks()`: Lista todos los mazos guardados
-- `delete_deck(filename)`: Elimina un mazo
-- `analyze_deck(deck)`: Analiza las estadísticas de un mazo
-- `validate_deck_format(deck, format_type)`: Valida si un mazo cumple con un formato
+- `create_deck(name, format_type='Standard')`: Creates a new deck
+- `save_deck(deck, filename)`: Saves a deck to file
+- `load_deck(filename)`: Loads a deck from file
+- `list_decks()`: Lists all saved decks
+- `delete_deck(filename)`: Deletes a deck
+- `analyze_deck(deck)`: Analyzes deck statistics
+- `validate_deck_format(deck, format_type)`: Validates if a deck complies with a format
 
 ### ScryfallService
 
-Integración con la API de Scryfall para obtener datos actualizados de cartas.
+Integration with Scryfall API to get updated card data.
 
-#### Métodos Principales:
+#### Main Methods:
 
-- `search_cards(query)`: Busca cartas en Scryfall
-- `get_card_by_name(name)`: Obtiene información detallada de una carta
-- `get_random_card()`: Obtiene una carta aleatoria
-- `get_card_image_url(card_id)`: Obtiene la URL de la imagen de una carta
+- `search_cards(query)`: Searches cards on Scryfall
+- `get_card_by_name(name)`: Gets detailed information of a card
+- `get_random_card()`: Gets a random card
+- `get_card_image_url(card_id)`: Gets the image URL of a card
 
 ### ImageService
 
-Gestiona el cache y descarga de imágenes de cartas.
+Manages cache and download of card images.
 
-#### Métodos Principales:
+#### Main Methods:
 
-- `get_card_image(card_id, image_url)`: Obtiene imagen de carta (cache o descarga)
-- `cache_image(url, filename)`: Almacena imagen en cache
-- `get_cache_info()`: Obtiene información del cache
-- `clear_cache()`: Limpia el cache de imágenes
+- `get_card_image(card_id, image_url)`: Gets card image (cache or download)
+- `cache_image(url, filename)`: Stores image in cache
+- `get_cache_info()`: Gets cache information
+- `clear_cache()`: Clears image cache
 
-## Controladores
+## Controllers
 
 ### AppController
 
-Controlador principal que coordina toda la aplicación.
+Main controller that coordinates the entire application.
 
 ### CardController
 
-Gestiona las operaciones de búsqueda y visualización de cartas.
+Manages card search and display operations.
 
-#### Métodos Principales:
+#### Main Methods:
 
-- `search_cards(query, limit=50)`: Busca cartas
-- `get_card_by_name(name)`: Obtiene carta específica
-- `get_random_cards(count=10)`: Obtiene cartas aleatorias
-- `advanced_search(filters)`: Búsqueda avanzada con filtros
-- `get_similar_cards(card)`: Encuentra cartas similares
-- `get_cards_by_color(color)`: Filtra por color
+- `search_cards(query, limit=50)`: Searches cards
+- `get_card_by_name(name)`: Gets specific card
+- `get_random_cards(count=10)`: Gets random cards
+- `advanced_search(filters)`: Advanced search with filters
+- `get_similar_cards(card)`: Finds similar cards
+- `get_cards_by_color(color)`: Filters by color
 
 ### DeckController
 
-Gestiona las operaciones de construcción y gestión de mazos.
+Manages deck construction and management operations.
 
-#### Métodos Principales:
+#### Main Methods:
 
-- `create_new_deck(name='New Deck', format_type='Standard')`: Crea nuevo mazo
-- `load_deck(filename)`: Carga mazo existente
-- `save_current_deck()`: Guarda el mazo actual
-- `add_card_to_deck(card_name, quantity=1)`: Añade carta al mazo
-- `remove_card_from_deck(card_name, quantity=1)`: Remueve carta del mazo
-- `get_deck_analysis()`: Analiza el mazo actual
-- `export_deck_to_file(filename, format_type='txt')`: Exporta mazo
-- `validate_deck_format(format_type)`: Valida formato del mazo
-- `get_available_decks()`: Lista mazos disponibles
-- `delete_deck(filename)`: Elimina mazo
+- `create_new_deck(name='New Deck', format_type='Standard')`: Creates new deck
+- `load_deck(filename)`: Loads existing deck
+- `save_current_deck()`: Saves current deck
+- `add_card_to_deck(card_name, quantity=1)`: Adds card to deck
+- `remove_card_from_deck(card_name, quantity=1)`: Removes card from deck
+- `get_deck_analysis()`: Analyzes current deck
+- `export_deck_to_file(filename, format_type='txt')`: Exports deck
+- `validate_deck_format(format_type)`: Validates deck format
+- `get_available_decks()`: Lists available decks
+- `delete_deck(filename)`: Deletes deck
 
-## Modelos de Datos
+## Data Models
 
 ### Card
 
-Representa una carta de Magic: The Gathering.
+Represents a Magic: The Gathering card.
 
-#### Atributos:
+#### Attributes:
 
-- `name`: Nombre de la carta
-- `mana_cost`: Coste de maná
-- `type_line`: Línea de tipo
-- `oracle_text`: Texto de la carta
-- `power`: Poder (para criaturas)
-- `toughness`: Resistencia (para criaturas)
-- `colors`: Colores de la carta
-- `rarity`: Rareza
-- `set_code`: Código del set
-- `collector_number`: Número de coleccionista
+- `name`: Card name
+- `mana_cost`: Mana cost
+- `type_line`: Type line
+- `oracle_text`: Card text
+- `power`: Power (for creatures)
+- `toughness`: Toughness (for creatures)
+- `colors`: Card colors
+- `rarity`: Rarity
+- `set_code`: Set code
+- `collector_number`: Collector number
 
-#### Propiedades:
+#### Properties:
 
-- `is_creature`: Verdadero si es una criatura
-- `is_spell`: Verdadero si es un hechizo
-- `is_land`: Verdadero si es una tierra
+- `is_creature`: True if it's a creature
+- `is_spell`: True if it's a spell
+- `is_land`: True if it's a land
 
 ### Deck
 
-Representa un mazo de cartas.
+Represents a deck of cards.
 
-#### Atributos:
+#### Attributes:
 
-- `name`: Nombre del mazo
-- `format_type`: Formato del mazo (Standard, Modern, etc.)
-- `cards`: Diccionario de cartas y cantidades
-- `sideboard`: Diccionario de cartas del sideboard
+- `name`: Deck name
+- `format_type`: Deck format (Standard, Modern, etc.)
+- `cards`: Dictionary of cards and quantities
+- `sideboard`: Dictionary of sideboard cards
 
-#### Métodos:
+#### Methods:
 
-- `add_card(card, quantity=1, sideboard=False)`: Añade carta al mazo
-- `remove_card(card_name, quantity=1, sideboard=False)`: Remueve carta
-- `get_total_cards()`: Obtiene total de cartas
-- `get_mana_curve()`: Calcula curva de maná
-- `get_color_distribution()`: Calcula distribución de colores
-- `is_legal_format(format_type)`: Verifica legalidad en formato
-- `to_dict()`: Convierte a diccionario
-- `from_dict(data)`: Crea desde diccionario
+- `add_card(card, quantity=1, sideboard=False)`: Adds card to deck
+- `remove_card(card_name, quantity=1, sideboard=False)`: Removes card
+- `get_total_cards()`: Gets total cards
+- `get_mana_curve()`: Calculates mana curve
+- `get_color_distribution()`: Calculates color distribution
+- `is_legal_format(format_type)`: Verifies format legality
+- `to_dict()`: Converts to dictionary
+- `from_dict(data)`: Creates from dictionary
 
-## Formatos de Archivo
+## File Formats
 
-### Mazos (.deck)
+### Decks (.deck)
 
-Los mazos se guardan en formato JSON con la siguiente estructura:
+Decks are saved in JSON format with the following structure:
 
 ```json
 {
-  "name": "Nombre del Mazo",
+  "name": "Deck Name",
   "format": "Standard",
   "cards": {
     "Lightning Bolt": 4,
@@ -163,9 +163,9 @@ Los mazos se guardan en formato JSON con la siguiente estructura:
 }
 ```
 
-### Base de Datos de Cartas (.csv)
+### Card Database (.csv)
 
-La base de datos de cartas utiliza formato CSV con las siguientes columnas:
+The card database uses CSV format with the following columns:
 
 - name
 - mana_cost

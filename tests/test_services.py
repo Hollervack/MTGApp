@@ -6,7 +6,7 @@ import shutil
 from unittest.mock import Mock, patch, mock_open
 import pandas as pd
 
-# Agregar el directorio src al path
+# Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 try:
@@ -16,7 +16,7 @@ try:
     from models.card import Card
     from models.deck import Deck
 except ImportError:
-    # Fallback para imports absolutos
+    # Fallback for absolute imports
     import sys
     import os
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -28,10 +28,10 @@ except ImportError:
 
 
 class TestCardService(unittest.TestCase):
-    """Tests para CardService"""
+    """Tests for CardService"""
     
     def setUp(self):
-        """Configuración inicial para tests"""
+        """Initial setup for tests"""
         # Create test cards
         self.test_cards = [
             Card(
@@ -64,36 +64,36 @@ class TestCardService(unittest.TestCase):
                 self.card_service.load_cards()
     
     def test_load_cards(self):
-        """Test cargar cartas desde archivo"""
+        """Test loading cards from file"""
         cards = self.card_service.load_cards()
         self.assertIsInstance(cards, list)
         self.assertEqual(len(cards), 2)
         
-        # Verificar que las cartas se cargaron correctamente
+        # Verify that cards were loaded correctly
         card_names = [card.card_name for card in cards]
         self.assertIn('Lightning Bolt', card_names)
         self.assertIn('Counterspell', card_names)
     
     def test_search_cards_by_name(self):
-        """Test búsqueda por nombre"""
-        # Primero cargar las cartas
+        """Test search by name"""
+        # First load the cards
         self.card_service.load_cards()
         
         results = self.card_service.search_cards('Lightning')
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].card_name, 'Lightning Bolt')
         
-        # Búsqueda exacta
+        # Exact search
         results = self.card_service.search_cards('Lightning Bolt')
         self.assertEqual(len(results), 1)
         
-        # Búsqueda sin resultados
+        # Search with no results
         results = self.card_service.search_cards('Nonexistent')
         self.assertEqual(len(results), 0)
     
     def test_search_cards_by_color(self):
-        """Test búsqueda por color"""
-        # Primero cargar las cartas
+        """Test search by color"""
+        # First load the cards
         self.card_service.load_cards()
         
         results = self.card_service.get_cards_by_color(['R'])
@@ -105,38 +105,38 @@ class TestCardService(unittest.TestCase):
         self.assertEqual(results[0].card_name, 'Counterspell')
     
     def test_search_cards_by_type(self):
-        """Test búsqueda por tipo"""
-        # Primero cargar las cartas
+        """Test search by type"""
+        # First load the cards
         self.card_service.load_cards()
         
         results = self.card_service.get_cards_by_type('Instant')
         self.assertEqual(len(results), 2)
     
     def test_search_cards_by_cmc(self):
-        """Test búsqueda por coste de maná convertido"""
-        # Primero cargar las cartas
+        """Test search by converted mana cost"""
+        # First load the cards
         self.card_service.load_cards()
         
-        # Test búsqueda por tipo - simplificado ya que no tenemos CMC en los datos
+        # Test search by type - simplified since we don't have CMC in the data
         results = self.card_service.get_cards_by_type('Instant')
         self.assertEqual(len(results), 2)
     
     def test_get_card_by_name(self):
-        """Test obtener carta por nombre"""
-        # Primero cargar las cartas
+        """Test get card by name"""
+        # First load the cards
         self.card_service.load_cards()
         
         card = self.card_service.find_card_by_name('Lightning Bolt')
         self.assertIsNotNone(card)
         self.assertEqual(card.card_name, 'Lightning Bolt')
         
-        # Carta inexistente
+        # Non-existent card
         card = self.card_service.find_card_by_name('Nonexistent')
         self.assertIsNone(card)
     
     def test_get_statistics(self):
-        """Test obtener estadísticas de cartas"""
-        # Primero cargar las cartas
+        """Test get card statistics"""
+        # First load the cards
         self.card_service.load_cards()
         
         stats = self.card_service.get_statistics()
@@ -148,16 +148,16 @@ class TestCardService(unittest.TestCase):
 
 
 class TestDeckService(unittest.TestCase):
-    """Tests para DeckService"""
+    """Tests for DeckService"""
     
     def setUp(self):
-        """Configuración inicial para cada test"""
+        """Initial setup for each test"""
         self.test_dir = tempfile.mkdtemp()
-        # Crear un mock card_service
+        # Create a mock card_service
         self.mock_card_service = Mock()
         self.deck_service = DeckService(self.mock_card_service, self.test_dir)
         
-        # Crear mazo de prueba
+        # Create test deck
         self.test_deck = Deck(name="Test Deck")
         self.test_card = Card(
             card_name='Lightning Bolt',
@@ -168,14 +168,14 @@ class TestDeckService(unittest.TestCase):
         self.test_deck.add_card(self.test_card, 4)
     
     def tearDown(self):
-        """Limpieza después de cada test"""
+        """Cleanup after each test"""
         shutil.rmtree(self.test_dir, ignore_errors=True)
     
     @patch('os.makedirs')
     @patch('builtins.open', new_callable=unittest.mock.mock_open)
     @patch('json.dump')
     def test_save_deck(self, mock_json_dump, mock_open, mock_makedirs):
-        """Test guardar mazo"""
+        """Test save deck"""
         result = self.deck_service.save_deck(self.test_deck)
         
         self.assertTrue(result)
@@ -186,7 +186,7 @@ class TestDeckService(unittest.TestCase):
     @patch('builtins.open', new_callable=unittest.mock.mock_open, read_data='{"name": "Test Deck", "cards": {}}')
     @patch('json.load', return_value={'name': 'Test Deck', 'cards': {}})
     def test_load_deck(self, mock_json_load, mock_open, mock_exists):
-        """Test cargar mazo"""
+        """Test load deck"""
         deck = self.deck_service.load_deck('test_deck.json')
         
         self.assertIsNotNone(deck)
@@ -195,14 +195,14 @@ class TestDeckService(unittest.TestCase):
     
     @patch('os.path.exists', return_value=False)
     def test_load_nonexistent_deck(self, mock_exists):
-        """Test cargar mazo inexistente"""
+        """Test load non-existent deck"""
         deck = self.deck_service.load_deck('nonexistent.json')
         self.assertIsNone(deck)
     
     @patch('os.listdir', return_value=['deck1.json', 'deck2.json', 'not_a_deck.txt'])
     @patch('os.path.exists', return_value=True)
     def test_list_decks(self, mock_exists, mock_listdir):
-        """Test listar mazos guardados"""
+        """Test list saved decks"""
         decks = self.deck_service.list_decks()
         
         self.assertEqual(len(decks), 2)
@@ -211,8 +211,8 @@ class TestDeckService(unittest.TestCase):
         self.assertNotIn('not_a_deck.txt', decks)
     
     def test_analyze_deck(self):
-        """Test análisis de mazo"""
-        # Analizar mazo de prueba
+        """Test deck analysis"""
+        # Analyze test deck
         result = self.deck_service.analyze_deck(self.test_deck)
         
         self.assertIsInstance(result, dict)
@@ -223,8 +223,8 @@ class TestDeckService(unittest.TestCase):
         self.assertEqual(result['total_cards'], 4)
     
     def test_export_deck_to_txt(self):
-        """Test exportar mazo a texto"""
-        # Crear archivo temporal
+        """Test export deck to text"""
+        # Create temporary file
         with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
             temp_path = f.name
         
@@ -232,31 +232,31 @@ class TestDeckService(unittest.TestCase):
             result = self.deck_service.export_deck_to_txt(self.test_deck, temp_path)
             self.assertTrue(result)
             
-            # Verificar que el archivo existe
+            # Verify that file exists
             self.assertTrue(os.path.exists(temp_path))
             
-            # Verificar contenido
+            # Verify content
             with open(temp_path, 'r') as f:
                 content = f.read()
                 self.assertIn('Lightning Bolt', content)
         finally:
-            # Limpiar archivo temporal
+            # Clean up temporary file
             if os.path.exists(temp_path):
                 os.unlink(temp_path)
 
 
 class TestImageService(unittest.TestCase):
-    """Tests para ImageService"""
+    """Tests for ImageService"""
     
     def setUp(self):
-        """Configuración inicial para tests"""
+        """Initial setup for tests"""
         self.image_service = ImageService()
         self.test_url = 'https://example.com/image.jpg'
     
     @patch('requests.Session.get')
     def test_download_and_cache_image(self, mock_get):
-        """Test descargar y cachear imagen"""
-        # Mock de respuesta exitosa
+        """Test download and cache image"""
+        # Mock successful response
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.content = b'fake_image_data'
@@ -278,18 +278,18 @@ class TestImageService(unittest.TestCase):
                 mock_get.assert_called_once()
     
     def test_get_image_from_cache_only(self):
-        """Test obtener imagen solo desde caché"""
+        """Test get image only from cache"""
         # Test when image is not in cache
         result = self.image_service.get_image_from_cache_only(self.test_url)
         self.assertIsNone(result)
     
     def test_is_image_cached(self):
-        """Test verificar si imagen está en caché"""
+        """Test check if image is in cache"""
         result = self.image_service.is_image_cached(self.test_url)
         self.assertIsInstance(result, bool)
     
     def test_get_cache_info(self):
-        """Test obtener información del caché"""
+        """Test get cache information"""
         info = self.image_service.get_cache_info()
         
         self.assertIsInstance(info, dict)
@@ -298,7 +298,7 @@ class TestImageService(unittest.TestCase):
         self.assertIn('total_size_mb', info)
     
     def test_clear_cache(self):
-        """Test limpiar caché"""
+        """Test clear cache"""
         result = self.image_service.clear_cache()
         
         self.assertIsInstance(result, int)
