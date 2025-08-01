@@ -305,7 +305,7 @@ class TestImageService(unittest.TestCase):
         self.assertGreaterEqual(result, 0)
     
     def test_preload_image(self):
-        """Test precargar imagen"""
+        """Test preload image"""
         with patch.object(self.image_service, '_download_image', return_value=b'fake_data'):
             with patch.object(self.image_service, '_save_image_to_cache', return_value=True):
                 result = self.image_service.preload_image(self.test_url)

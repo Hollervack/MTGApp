@@ -20,17 +20,17 @@ The project follows a modular MVC (Model-View-Controller) architecture:
 ```
 MTGDeckConstructorApp/
 ├── src/
-│   ├── models/          # Modelos de datos (Card, Deck)
-│   ├── views/           # Interfaces gráficas
-│   ├── controllers/     # Lógica de negocio
-│   ├── services/        # Servicios (API, caché, datos)
-│   └── config/          # Configuraciones
-├── data/                # Datos de la aplicación
-├── tests/               # Pruebas unitarias
-├── docs/                # Documentación
-├── main.py              # Punto de entrada
-├── requirements.txt     # Dependencias
-└── README.md           # Este archivo
+│   ├── models/          # Data models (Card, Deck)
+│   ├── views/           # Graphic interface
+│   ├── controllers/     # Bussiness logic
+│   ├── services/        # Services (API, cache, data)
+│   └── config/          # Configuration
+├── data/                # App data
+├── tests/               # Unit Tests
+├── docs/                # Documents
+├── main.py              # Starting point
+├── requirements.txt     # Dependencies
+└── README.md           # This file
 ```
 
 ## 🚀 Quick Installation
