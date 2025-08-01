@@ -3,6 +3,10 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, simpledialog
 import logging
+import json
+import os
+import csv
+from pathlib import Path
 from typing import List, Dict, Any, Optional
 
 from ..controllers.app_controller import AppController
@@ -35,7 +39,7 @@ class CollectionView:
         # Panel central - lista de cartas de la colección
         self._create_collection_panel()
         
-        # Panel inferior - estadísticas
+        # Panel below - statistics
         self._create_stats_panel()
     
     def _create_tools_panel(self):
@@ -135,7 +139,7 @@ class CollectionView:
     
     def _create_stats_panel(self):
         """Creates the statistics panel"""
-        stats_frame = ttk.LabelFrame(self.frame, text="Estadísticas de la Colección")
+        stats_frame = ttk.LabelFrame(self.frame, text="Collection statistics")
         stats_frame.pack(fill=tk.X)
         
         # Frame para estadísticas
@@ -163,15 +167,72 @@ class CollectionView:
         self.by_rarity_label.pack(side=tk.LEFT)
     
     def _load_collection(self):
-        """Loads the collection from storage"""
+        """Loads the collection from the card database CSV and applies user modifications"""
         try:
-            # For now, empty collection
-            # TODO: Implement loading from file
+            # First, load from the main card database CSV file
+            cards_file = self.app_controller.settings.cards_file
             self.collection_cards = {}
+            
+            if os.path.exists(cards_file):
+                with open(cards_file, 'r', encoding='utf-8') as f:
+                    csv_reader = csv.DictReader(f, delimiter=';')
+                    for row in csv_reader:
+                        # Handle None values properly
+                        card_name_raw = row.get('card_name', '')
+                        quantity_raw = row.get('quantity', '0')
+                        
+                        # Check for None values before calling strip()
+                        card_name = card_name_raw.strip() if card_name_raw else ''
+                        quantity_str = quantity_raw.strip() if quantity_raw else '0'
+                        
+                        if card_name and quantity_str.isdigit():
+                            quantity = int(quantity_str)
+                            if quantity > 0:
+                                if card_name in self.collection_cards:
+                                    self.collection_cards[card_name] += quantity
+                                else:
+                                    self.collection_cards[card_name] = quantity
+                    
+                self.logger.info(f"Loaded base collection from CSV with {len(self.collection_cards)} unique cards")
+            else:
+                self.logger.warning(f"Card database file not found: {cards_file}")
+            
+            # Then, apply any user modifications from the collection file
+            collection_file = self.app_controller.settings.collection_file
+            if os.path.exists(collection_file):
+                try:
+                    with open(collection_file, 'r', encoding='utf-8') as f:
+                        user_modifications = json.load(f)
+                    
+                    # Apply user modifications (this overwrites the CSV quantities)
+                    self.collection_cards.update(user_modifications)
+                    self.logger.info(f"Applied user modifications, final collection has {len(self.collection_cards)} unique cards")
+                except Exception as e:
+                    self.logger.warning(f"Could not load user modifications: {e}")
+            
             self._update_collection_display()
         except Exception as e:
             self.logger.error(f"Error loading collection: {e}")
+            self.collection_cards = {}
+            self._update_collection_display()
             messagebox.showerror("Error", f"Error loading collection: {e}")
+    
+    def _save_collection(self):
+        """Saves the collection modifications to a separate file"""
+        try:
+            # Save user modifications to a separate collection file
+            collection_file = self.app_controller.settings.collection_file
+            # Create directory if it doesn't exist
+            Path(collection_file).parent.mkdir(parents=True, exist_ok=True)
+            
+            with open(collection_file, 'w', encoding='utf-8') as f:
+                json.dump(self.collection_cards, f, indent=2, ensure_ascii=False)
+            self.logger.info(f"Saved collection modifications with {len(self.collection_cards)} unique cards")
+            return True
+        except Exception as e:
+            self.logger.error(f"Error saving collection: {e}")
+            messagebox.showerror("Error", f"Error saving collection: {e}")
+            return False
     
     def _update_collection_display(self):
         """Updates the collection display"""
@@ -298,8 +359,9 @@ class CollectionView:
         self.add_card_var.set("")
         self.quantity_var.set("1")
         
-        # Actualizar visualización
+        # Actualizar visualización y guardar
         self._update_collection_display()
+        self._save_collection()
         
         messagebox.showinfo("Success", f"Added {quantity}x {card_name} to collection")
     
@@ -336,8 +398,9 @@ class CollectionView:
         self.add_card_var.set("")
         self.quantity_var.set("1")
         
-        # Actualizar visualización
+        # Actualizar visualización y guardar
         self._update_collection_display()
+        self._save_collection()
     
     def _on_card_selected(self, event=None):
         """Handles card selection"""
@@ -378,6 +441,7 @@ class CollectionView:
                 self.collection_cards[card_name] = new_quantity
             
             self._update_collection_display()
+            self._save_collection()
     
     def _view_card_details(self):
         """Shows details of the selected card"""
@@ -397,6 +461,7 @@ class CollectionView:
         if result:
             del self.collection_cards[card_name]
             self._update_collection_display()
+            self._save_collection()
     
     def _import_collection(self):
         """Imports a collection from file"""
@@ -435,6 +500,7 @@ class CollectionView:
         if result:
             self.collection_cards.clear()
             self._update_collection_display()
+            self._save_collection()
             messagebox.showinfo("Success", "Collection cleared")
     
     def show(self):
@@ -459,3 +525,4 @@ class CollectionView:
         """Sets the collection"""
         self.collection_cards = collection.copy()
         self._update_collection_display()
+        self._save_collection()

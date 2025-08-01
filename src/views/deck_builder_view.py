@@ -178,6 +178,22 @@ class DeckBuilderView:
         self.unique_cards_label.config(text=f"Unique cards: {total_cards}")
         self.avg_cmc_label.config(text="Average CMC: 0.0")
     
+    def _initialize_cards(self):
+        """Initializes the card database"""
+        try:
+            # Load cards through the app controller
+            card_service = self.app_controller.get_card_service()
+            cards = card_service.load_cards()
+            self.logger.info(f"Loaded {len(cards)} cards from database")
+            
+            # Update status to show card count
+            if hasattr(self.parent, 'master') and hasattr(self.parent.master, 'status_var'):
+                self.parent.master.status_var.set(f"Loaded {len(cards)} cards")
+                
+        except Exception as e:
+            self.logger.error(f"Error loading cards: {e}")
+            messagebox.showerror("Error", f"Could not load card database: {e}")
+    
     def new_deck(self):
         """Creates a new deck"""
         self.current_deck = None
@@ -211,6 +227,8 @@ class DeckBuilderView:
         """Shows the view"""
         if self.frame:
             self.frame.pack(fill=tk.BOTH, expand=True)
+            # Initialize card database on first show
+            self._initialize_cards()
     
     def hide(self):
         """Hides the view"""

@@ -73,21 +73,22 @@ class Card:
     
     @classmethod
     def from_dict(cls, data: dict) -> 'Card':
-        """Creates a card from a dictionary"""
+        """Creates a card from a dictionary (CSV format)"""
+        # Handle the actual CSV structure from databaseMTG.csv
         return cls(
             card_name=data.get('card_name', ''),
             english_card_name=data.get('english_card_name'),
             quantity=int(data.get('quantity', 0)),
             scryfall_uuid=data.get('scryfall_uuid'),
-            mana_cost=data.get('mana_cost'),
-            type_line=data.get('type_line'),
-            oracle_text=data.get('oracle_text'),
-            power=data.get('power'),
-            toughness=data.get('toughness'),
-            colors=data.get('colors', []),
-            color_identity=data.get('color_identity', []),
-            rarity=data.get('rarity'),
+            mana_cost=data.get('mana_cost'),  # Not in CSV, will be None
+            type_line=data.get('type_line'),  # Not in CSV, will be None
+            oracle_text=data.get('oracle_text'),  # Not in CSV, will be None
+            power=data.get('power'),  # Not in CSV, will be None
+            toughness=data.get('toughness'),  # Not in CSV, will be None
+            colors=data.get('colors', []),  # Not in CSV, will be empty list
+            color_identity=data.get('color_identity', []),  # Not in CSV, will be empty list
+            rarity=data.get('rarity'),  # Not in CSV, will be None
             set_code=data.get('set_code'),
             collector_number=data.get('collector_number'),
-            image_url=data.get('image_url')
+            image_url=data.get('image_url')  # Not in CSV, will be None
         )

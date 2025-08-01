@@ -24,15 +24,15 @@ class MainWindow:
         self.root = tk.Tk()
         self.root.title(f"{self.settings.app_name} v{self.settings.app_version}")
         
+        # State variables
+        self.current_view = None
+        self.views = {}
+        
         # Configure window
         self._setup_window()
         self._create_menu()
         self._create_main_interface()
         self._setup_bindings()
-        
-        # State variables
-        self.current_view = None
-        self.views = {}
         
         self.logger.info("Main window initialized")
     
@@ -195,20 +195,17 @@ class MainWindow:
                 if view_name == 'deck_builder':
                     self.views[view_name] = DeckBuilderView(
                         self.content_frame, 
-                        self.app_controller.get_deck_service(),
-                        self.app_controller.get_card_service(),
-                        self.app_controller.get_image_service()
+                        self.app_controller
                     )
                 elif view_name == 'card_browser':
                     self.views[view_name] = CardBrowserView(
                         self.content_frame,
-                        self.app_controller.get_card_service(),
-                        self.app_controller.get_image_service()
+                        self.app_controller
                     )
                 elif view_name == 'collection':
                     self.views[view_name] = CollectionView(
                         self.content_frame,
-                        self.app_controller.get_card_service()
+                        self.app_controller
                     )
             
             # Show view

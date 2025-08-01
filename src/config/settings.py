@@ -197,6 +197,10 @@ class Settings:
         return self.get('data.decks_directory', 'data/decks')
     
     @property
+    def collection_file(self) -> str:
+        return self.get('data.collection_file', 'data/collection.json')
+    
+    @property
     def cache_directory(self) -> str:
         return self.get('data.cache_directory', 'data/cache')
     

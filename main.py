@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Punto de entrada principal para MTG Deck Constructor App"""
+"""Starting point of the MTG Deck Constructor application"""
 
 import sys
 import logging
